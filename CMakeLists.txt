@@ -9,14 +9,10 @@ project(
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 option(TESTS_3BMDA "Build test programs" OFF)
-# option(BENCHMARK_3BMDA "Benchmark mode" OFF)
 option(PROFILE_3BMDA "Profile mode" OFF)
 option(USE_OMP "Use OPENMP" OFF)
 option(MEASURESIMSTEP_3BMDA "Measure one timestep" OFF)
 option(VLEVEL "Verbosity Level" -1)
-
-set(MPIEXEC_EXECUTABLE mpiexec)
-set(MPIEXEC_NUMPROC_FLAG -n)
 
 find_package(Eigen3 REQUIRED)
 find_package(MPI REQUIRED)
@@ -33,17 +29,6 @@ if(VLEVEL GREATER_EQUAL 0)
   add_compile_definitions(VLEVEL=${VLEVEL})
 endif()
 
-# we have to set this for google benchmark
-if(BENCHMARK_3BMDA)
-  set(NDEBUG)
-  # https://github.com/google/benchmark/issues/773#issuecomment-616067912
-  set(RUN_HAVE_STD_REGEX 0)
-  set(RUN_HAVE_POSIX_REGEX 0)
-  set(COMPILE_HAVE_GNU_POSIX_REGEX 0)
-else()
-  unset(NDEBUG)
-endif()
-
 if(CMAKE_COMPILER_IS_GNUCXX)
   message(STATUS "GCC detected, adding compile flags")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
@@ -55,11 +40,8 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     unset(OPENMPAVAIL)
   endif(${OpenMP_FOUND})
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -pg -Og")
-  # set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -march=native")
   set(CMAKE_CXX_FLAGS_RELEASE
       "${CMAKE_CXX_FLAGS_RELEASE} -march=native -fno-omit-frame-pointer")
-  # set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -O3
-  # -march=native")
   set(CMAKE_CXX_FLAGS_RELWITHDEBINFO " -pg -Og -march=native")
 endif(CMAKE_COMPILER_IS_GNUCXX)
 
@@ -69,6 +51,8 @@ add_subdirectory(tools)
 # MAIN
 
 include_directories(SYSTEM ${MPI_INCLUDE_PATH})
+
+# file(GLOB_RECURSE MAIN_SOURCES CONFIGURE_DEPENDS "src/*.hpp" "src/*.cpp")
 
 set(MAIN_SOURCES
     src/main.cpp

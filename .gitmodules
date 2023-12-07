@@ -1,12 +1,12 @@
-[submodule "src/external/rapidcsv"]
-	path = src/external/rapidcsv
+[submodule "external/rapidcsv"]
+	path = external/rapidcsv
 	url = https://github.com/d99kris/rapidcsv.git
-[submodule "src/external/gtest"]
-	path = src/external/gtest
+[submodule "external/gtest"]
+	path = external/gtest
 	url = https://github.com/google/googletest.git
-[submodule "src/external/rapidyaml"]
-	path = src/external/rapidyaml
+[submodule "external/rapidyaml"]
+	path = external/rapidyaml
 	url = https://github.com/biojppm/rapidyaml.git
-[submodule "src/external/rapidjson"]
-	path = src/external/rapidjson
+[submodule "external/rapidjson"]
+	path = external/rapidjson
 	url = https://github.com/Tencent/rapidjson.git
