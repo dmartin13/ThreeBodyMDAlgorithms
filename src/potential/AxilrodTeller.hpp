@@ -1,14 +1,12 @@
 #pragma once
 
-#include "Potential.hpp"
+#include "TriwisePotential.hpp"
 
-class AxilrodTeller final : public Potential {
+class AxilrodTeller final : public TriwisePotential {
 private:
-    const double v = 1.0;
+    const double nu = 1.0;
 
 public:
-    AxilrodTeller(double v);
-    virtual ~AxilrodTeller();
+    AxilrodTeller(double nu);
     void CalculateForces(Utility::Particle &i, Utility::Particle &j, Utility::Particle &k) override;
-    void Init(std::shared_ptr<Simulation> simulation) override;
 };

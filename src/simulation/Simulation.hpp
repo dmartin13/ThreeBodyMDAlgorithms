@@ -37,6 +37,7 @@ public:
     std::shared_ptr<Algorithm> GetAlgorithm();
     std::shared_ptr<Topology> GetTopology();
     std::shared_ptr<Potential> GetPotential();
+    std::shared_ptr<TriwisePotential> GetTriwisePotential();
     std::shared_ptr<DomainDecomposition> GetDecomposition();
     MPI_Datatype* GetMPIParticleType();
     std::vector<Utility::Particle>& GetAllParticles();

@@ -10,6 +10,7 @@
 #include "../decomposition/DomainDecomposition.hpp"
 #include "../fwd.hpp"
 #include "../potential/Potential.hpp"
+#include "../potential/TriwisePotential.hpp"
 #include "../simulation/Simulation.hpp"
 #include "../topology/Topology.hpp"
 #include "../utility/utility.hpp"
@@ -21,7 +22,7 @@ class Algorithm {
 protected:
     std::shared_ptr<Simulation> simulation;
     MPI_Datatype *mpiParticleType;
-    std::shared_ptr<Potential> potential;
+    std::shared_ptr<TriwisePotential> potential;
     int worldSize;
     int worldRank;
     int numShifts;

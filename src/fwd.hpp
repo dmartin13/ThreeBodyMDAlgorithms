@@ -19,6 +19,10 @@ class RingTopology;
 class CartTopology;
 
 // potentials
+class Potential;
+class PairwisePotential;
+class TriwisePotential;
 class AxilrodTeller;
+class LennardJones;
 
 class MPIReporter;

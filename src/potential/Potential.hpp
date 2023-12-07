@@ -14,15 +14,12 @@ protected:
     std::shared_ptr<Simulation> simulation;
 
 #ifdef PROFILE_3BMDA
-    int64_t timeAcc;
-    int counter;
+    uint64_t timeAcc;
+    size_t counter;
 #endif
 
 public:
-    Potential();
-    virtual ~Potential();
     virtual void Init(std::shared_ptr<Simulation> simulation);
-    virtual void CalculateForces(Utility::Particle &i, Utility::Particle &j, Utility::Particle &k) = 0;
 
 #ifdef PROFILE_3BMDA
     std::map<std::string, std::pair<char, double>> GetAvgCalcTime();

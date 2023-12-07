@@ -19,6 +19,7 @@ set(MAIN_SOURCES
     utility/utility.cpp
     potential/AxilrodTeller.cpp
     potential/Potential.cpp
+    potential/LennardJones.cpp
     simulation/Simulation.cpp
     MPIReporter.cpp)
 

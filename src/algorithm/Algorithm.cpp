@@ -8,7 +8,7 @@ void Algorithm::Init(std::shared_ptr<Simulation> simulation)
 {
     this->simulation = simulation;
     this->mpiParticleType = simulation->GetMPIParticleType();
-    this->potential = this->simulation->GetPotential();
+    this->potential = this->simulation->GetTriwisePotential();
     this->worldSize = this->simulation->GetTopology()->GetWorldSize();
     this->worldRank = this->simulation->GetTopology()->GetWorldRank();
 #ifdef PROFILE_3BMDA
@@ -106,7 +106,7 @@ std::tuple<uint64_t, uint64_t> Algorithm::calculateInteractions(std::vector<Util
                 std::chrono::time_point<std::chrono::system_clock> end1;
                 start1 = std::chrono::system_clock::now();
 #endif
-                this->potential->CalculateForces(b0[i], b1[j], b2[k]);
+                potential->CalculateForces(b0[i], b1[j], b2[k]);
 #ifdef PROFILE_3BMDA
                 end1 = std::chrono::system_clock::now();
                 auto elapsed_time1 = std::chrono::duration_cast<std::chrono::nanoseconds>(end1 - start1);
@@ -214,7 +214,7 @@ void Algorithm::calcParticleInteractions(std::vector<std::tuple<int, int, int>> 
     }
 #else
     for (auto it = particleTripletsToCalculate.begin(); it < particleTripletsToCalculate.end(); it++) {
-        this->potential->CalculateForces(b0[std::get<0>((*it))], b1[std::get<1>((*it))], b2[std::get<2>((*it))]);
+        potential->CalculateForces(b0[std::get<0>((*it))], b1[std::get<1>((*it))], b2[std::get<2>((*it))]);
     }
 #endif
 
