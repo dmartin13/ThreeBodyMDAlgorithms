@@ -8,7 +8,7 @@
 #include <tuple>
 #include <vector>
 
-#include "../topology/CartTopology.hpp"
+#include "topology/CartTopology.hpp"
 #include "DomainDecomposition.hpp"
 
 class RegularGridDecomposition final : public DomainDecomposition {

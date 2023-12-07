@@ -4,9 +4,9 @@
 #include <chrono>
 #endif
 
-#include "../algorithm/Algorithm.hpp"
-#include "../fwd.hpp"
-#include "../potential/Potential.hpp"
+#include "algorithm/Algorithm.hpp"
+#include "fwd.hpp"
+#include "potential/Potential.hpp"
 
 class Simulation : public std::enable_shared_from_this<Simulation> {
 private:

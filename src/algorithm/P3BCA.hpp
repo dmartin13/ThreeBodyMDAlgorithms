@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../decomposition/RegularGridDecomposition.hpp"
-#include "../topology/CartTopology.hpp"
+#include "decomposition/RegularGridDecomposition.hpp"
+#include "topology/CartTopology.hpp"
 #include "Algorithm.hpp"
 
 class P3BCA final : public Algorithm {

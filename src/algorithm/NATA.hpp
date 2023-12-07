@@ -2,8 +2,7 @@
 #include <chrono>
 #include <vector>
 
-#include "../topology/RingTopology.hpp"
-#include "../utility/vector3d.h"
+#include "topology/RingTopology.hpp"
 #include "Algorithm.hpp"
 
 class NATA final : public Algorithm {

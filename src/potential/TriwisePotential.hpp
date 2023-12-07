@@ -2,8 +2,8 @@
 
 #include <memory>
 
-#include "../fwd.hpp"
-#include "../utility/utility.hpp"
+#include "fwd.hpp"
+#include "utility/utility.hpp"
 #include "Potential.hpp"
 
 class TriwisePotential : public Potential {

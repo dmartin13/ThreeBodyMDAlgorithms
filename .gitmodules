@@ -1,15 +1,9 @@
-[submodule "src/external/vectorclass"]
-	path = src/external/vectorclass
-	url = https://github.com/vectorclass/version2.git
 [submodule "src/external/rapidcsv"]
 	path = src/external/rapidcsv
 	url = https://github.com/d99kris/rapidcsv.git
 [submodule "src/external/gtest"]
 	path = src/external/gtest
 	url = https://github.com/google/googletest.git
-[submodule "src/external/benchmark"]
-	path = src/external/benchmark
-	url = https://github.com/google/benchmark.git
 [submodule "src/external/rapidyaml"]
 	path = src/external/rapidyaml
 	url = https://github.com/biojppm/rapidyaml.git

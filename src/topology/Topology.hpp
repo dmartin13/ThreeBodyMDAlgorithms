@@ -4,9 +4,9 @@
 
 #include <memory>
 
-#include "../fwd.hpp"
-#include "../simulation/Simulation.hpp"
-#include "../utility/utility.hpp"
+#include "fwd.hpp"
+#include "simulation/Simulation.hpp"
+#include "utility/utility.hpp"
 
 class Topology {
 protected:

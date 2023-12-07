@@ -32,7 +32,8 @@ int main(int argc, char *argv[])
     std::array<double, 3> velocity;
     double mass = 0;
     ParticleGenerator::Generator gen = ParticleGenerator::Generator::Uniform;
-    uint_fast32_t seed0, seed1;
+    uint_fast32_t seed0 = 0;
+    uint_fast32_t seed1 = 0;
 
     static const struct option long_options[] = {{"generator", required_argument, 0, 'a'},
                                                  {"numparticles", required_argument, 0, 'b'},

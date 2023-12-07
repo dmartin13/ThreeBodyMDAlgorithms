@@ -4,9 +4,9 @@
 #include <memory>
 #include <vector>
 
-#include "../fwd.hpp"
-#include "../simulation/Simulation.hpp"
-#include "../utility/structs.hpp"
+#include "fwd.hpp"
+#include "simulation/Simulation.hpp"
+#include "utility/structs.hpp"
 
 class DomainDecomposition {
 protected:

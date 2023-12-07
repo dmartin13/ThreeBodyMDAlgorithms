@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 
-#include "../topology/RingTopology.hpp"
+#include "topology/RingTopology.hpp"
 #include "Algorithm.hpp"
 
 class AUTA final : public Algorithm {
