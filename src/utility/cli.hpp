@@ -1,11 +1,11 @@
+#pragma once
+
 #include <Eigen/Dense>
 #include <iostream>
 #include <string>
 #include <vector>
 
 #include "enums.hpp"
-
-#pragma once
 
 namespace Utility
 {
