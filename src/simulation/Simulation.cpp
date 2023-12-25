@@ -1,12 +1,14 @@
 #include "Simulation.hpp"
 
 Simulation::Simulation(int iterations, std::shared_ptr<Algorithm> algorithm, std::shared_ptr<Topology> topology,
-                       std::shared_ptr<Potential> potential, std::shared_ptr<DomainDecomposition> decomposition,
-                       MPI_Datatype* mpiParticleType, std::vector<Utility::Particle>& particles, double dt,
-                       Eigen::Vector3d gForce, std::string csvOutput)
-    : iterations(iterations), algorithm(algorithm), topology(topology), potential(potential),
-      decomposition(decomposition), mpiParticleType(mpiParticleType), particles(particles), dt(dt), gForce(gForce),
-      csvOutput(csvOutput)
+                       std::shared_ptr<PairwisePotential> pairwisepotential,
+                       std::shared_ptr<TriwisePotential> triwisepotential,
+                       std::shared_ptr<DomainDecomposition> decomposition, MPI_Datatype* mpiParticleType,
+                       std::vector<Utility::Particle>& particles, double dt, Eigen::Vector3d gForce,
+                       std::string csvOutput)
+    : iterations(iterations), algorithm(algorithm), topology(topology), pairwisepotential(pairwisepotential),
+      triwisepotential(triwisepotential), decomposition(decomposition), mpiParticleType(mpiParticleType),
+      particles(particles), dt(dt), gForce(gForce), csvOutput(csvOutput)
 {}
 
 void Simulation::Init()
@@ -15,15 +17,17 @@ void Simulation::Init()
     this->topology->Init(simulationPtr);
     this->decomposition->Init(simulationPtr);
     this->algorithm->Init(simulationPtr);
-    this->potential->Init(simulationPtr);
+    // this->potential->Init(simulationPtr);
+    this->pairwisepotential->Init(simulationPtr);
+    this->triwisepotential->Init(simulationPtr);
 }
 
 Simulation::~Simulation() {}
 
 std::shared_ptr<Algorithm> Simulation::GetAlgorithm() { return this->algorithm; }
 std::shared_ptr<Topology> Simulation::GetTopology() { return this->topology; }
-std::shared_ptr<Potential> Simulation::GetPotential() { return this->potential; }
-std::shared_ptr<TriwisePotential> Simulation::GetTriwisePotential() { return nullptr; }
+std::shared_ptr<PairwisePotential> Simulation::GetPairwisePotential() { return this->pairwisepotential; }
+std::shared_ptr<TriwisePotential> Simulation::GetTriwisePotential() { return this->triwisepotential; }
 std::shared_ptr<DomainDecomposition> Simulation::GetDecomposition() { return this->decomposition; }
 
 void Simulation::Start()

@@ -11,6 +11,7 @@
 #include "decomposition/AtomDecomposition.hpp"
 #include "decomposition/RegularGridDecomposition.hpp"
 #include "potential/AxilrodTeller.hpp"
+#include "potential/LennardJones.hpp"
 #include "simulation/Simulation.hpp"
 #include "topology/CartTopology.hpp"
 #include "topology/RingTopology.hpp"
@@ -39,6 +40,7 @@ std::shared_ptr<Simulation> createNATAContext(std::string csvOut)
 
     // create potential
     std::shared_ptr<AxilrodTeller> axilrodTeller = std::make_shared<AxilrodTeller>(1.0);
+    std::shared_ptr<LennardJones> lj = std::make_shared<LennardJones>(1.0, 1.0);
 
     // create algorithm
     std::shared_ptr<NATA> nata = std::make_shared<NATA>();
@@ -49,7 +51,7 @@ std::shared_ptr<Simulation> createNATAContext(std::string csvOut)
     // MPI_Datatype* mpiParticleType, std::vector<Utility::Particle>& particles, double dt,
     // Eigen::Vector3d gForce
     std::shared_ptr<Simulation> simulation =
-        std::make_shared<Simulation>(a.iterations, nata, ringTopology, axilrodTeller, atomDecomposition,
+        std::make_shared<Simulation>(a.iterations, nata, ringTopology, lj, axilrodTeller, atomDecomposition,
                                      &mpiParticleType, particles, a.deltaT, a.gForce, csvOut);
     return simulation;
 }
@@ -64,6 +66,7 @@ std::shared_ptr<Simulation> createP3BCAContext(std::string csvOut, std::vector<i
 
     // create potential
     std::shared_ptr<AxilrodTeller> axilrodTeller = std::make_shared<AxilrodTeller>(1.0);
+    std::shared_ptr<LennardJones> lj = std::make_shared<LennardJones>(1.0, 1.0);
 
     // create algorithm
     std::shared_ptr<P3BCA> p3bca = std::make_shared<P3BCA>(a.cutoff);
@@ -74,7 +77,7 @@ std::shared_ptr<Simulation> createP3BCAContext(std::string csvOut, std::vector<i
     // MPI_Datatype* mpiParticleType, std::vector<Utility::Particle>& particles, double dt,
     // Eigen::Vector3d gForce
     std::shared_ptr<Simulation> simulation =
-        std::make_shared<Simulation>(a.iterations, p3bca, cartTopology, axilrodTeller, regularGridDecomposition,
+        std::make_shared<Simulation>(a.iterations, p3bca, cartTopology, lj, axilrodTeller, regularGridDecomposition,
                                      &mpiParticleType, particles, a.deltaT, a.gForce, csvOut);
     return simulation;
 }
@@ -89,6 +92,7 @@ std::shared_ptr<Simulation> createAUTAContext(std::string csvOut)
 
     // create potential
     std::shared_ptr<AxilrodTeller> axilrodTeller = std::make_shared<AxilrodTeller>(1.0);
+    std::shared_ptr<LennardJones> lj = std::make_shared<LennardJones>(1.0, 1.0);
 
     // create algorithm
     std::shared_ptr<AUTA> auta = std::make_shared<AUTA>();
@@ -99,7 +103,7 @@ std::shared_ptr<Simulation> createAUTAContext(std::string csvOut)
     // MPI_Datatype* mpiParticleType, std::vector<Utility::Particle>& particles, double dt,
     // Eigen::Vector3d gForce
     std::shared_ptr<Simulation> simulation =
-        std::make_shared<Simulation>(a.iterations, auta, ringTopology, axilrodTeller, atomDecomposition,
+        std::make_shared<Simulation>(a.iterations, auta, ringTopology, lj, axilrodTeller, atomDecomposition,
                                      &mpiParticleType, particles, a.deltaT, a.gForce, csvOut);
     return simulation;
 }

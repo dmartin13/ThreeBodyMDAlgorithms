@@ -15,6 +15,7 @@
 #include "decomposition/RegularGridDecomposition.hpp"
 #include "fwd.hpp"
 #include "potential/AxilrodTeller.hpp"
+#include "potential/LennardJones.hpp"
 #include "potential/Potential.hpp"
 #include "simulation/Simulation.hpp"
 #include "../tools/ClosestPackedGenerator.hpp"
