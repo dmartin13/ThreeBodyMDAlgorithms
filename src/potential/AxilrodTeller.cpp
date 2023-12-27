@@ -114,17 +114,17 @@ void AxilrodTeller::CalculateForces(Utility::Particle &i, Utility::Particle &j, 
         k.fZ -= newKfZContrib;
     }
 #else
-    i.fX -= newIfXContrib;
-    i.fY -= newIfYContrib;
-    i.fZ -= newIfZContrib;
+    i.f1X -= newIfXContrib;
+    i.f1Y -= newIfYContrib;
+    i.f1Z -= newIfZContrib;
 
-    j.fX -= newJfXContrib;
-    j.fY -= newJfYContrib;
-    j.fZ -= newJfZContrib;
+    j.f1X -= newJfXContrib;
+    j.f1Y -= newJfYContrib;
+    j.f1Z -= newJfZContrib;
 
-    k.fX -= newKfXContrib;
-    k.fY -= newKfYContrib;
-    k.fZ -= newKfZContrib;
+    k.f1X -= newKfXContrib;
+    k.f1Y -= newKfYContrib;
+    k.f1Z -= newKfZContrib;
 #endif
     /*
     #ifdef PROFILE_3BMDA

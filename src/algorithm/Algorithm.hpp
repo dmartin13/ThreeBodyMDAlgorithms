@@ -9,6 +9,7 @@
 #include "MPIReporter.hpp"
 #include "decomposition/DomainDecomposition.hpp"
 #include "fwd.hpp"
+#include "potential/PairwisePotential.hpp"
 #include "potential/Potential.hpp"
 #include "potential/TriwisePotential.hpp"
 #include "simulation/Simulation.hpp"
@@ -22,6 +23,7 @@ protected:
     std::shared_ptr<Simulation> simulation;
     MPI_Datatype *mpiParticleType;
     std::shared_ptr<TriwisePotential> potential;
+    std::shared_ptr<PairwisePotential> pairwisePotential;
     int worldSize;
     int worldRank;
     int numShifts;
@@ -42,6 +44,11 @@ protected:
                                                          std::vector<Utility::Particle> &b2, int b0Owner, int b1Owner,
                                                          int b2Owner, int b0Start, int b0NumSteps, double cutoff,
                                                          Eigen::Array3d physicalDomainSize);
+
+    std::tuple<uint64_t, uint64_t> calculatePairwiseInteractions(std::vector<Utility::Particle> &b0,
+                                                                 std::vector<Utility::Particle> &b1, int b0Owner,
+                                                                 int b1Owner, int b0Start, int b0NumSteps,
+                                                                 double cutoff, Eigen::Array3d physicalDomainSize);
 #ifdef PROFILE_3BMDA
     void calcParticleInteractions(std::vector<std::tuple<int, int, int>> &particleTripletsToCalculate,
                                   std::vector<Utility::Particle> &b0, std::vector<Utility::Particle> &b1,
@@ -72,8 +79,14 @@ public:
                                                          std::vector<Utility::Particle> &b2, int b0Owner, int b1Owner,
                                                          int b2Owner, double cutoff, Eigen::Array3d physicalDomainSize);
 
+    std::tuple<uint64_t, uint64_t> CalculatePairwiseInteractions(std::vector<Utility::Particle> &b0,
+                                                                 std::vector<Utility::Particle> &b1, int b0Owner,
+                                                                 int b1Owner);
+
     void SumUpParticles(std::vector<Utility::Particle> &b0, std::vector<Utility::Particle> &b1,
                         std::vector<Utility::Particle> &b2);
+
+    void SumUpParticles(std::vector<Utility::Particle> &b0, std::vector<Utility::Particle> &b1);
 
     int GetNumShifts();
 

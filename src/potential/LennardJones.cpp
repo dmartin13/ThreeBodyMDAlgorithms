@@ -27,12 +27,12 @@ void LennardJones::CalculateForces(Utility::Particle &i, Utility::Particle &j)
     double fac = epsilon24 * (lj12 + lj12m6) * invdr2;
     auto f = dr * fac;
 
-    i.fX += f.x();
-    i.fY += f.y();
-    i.fZ += f.z();
+    i.f0X += f.x();
+    i.f0Y += f.y();
+    i.f0Z += f.z();
 
     // we use newton 3
-    j.fX -= f.x();
-    j.fY -= f.y();
-    j.fZ -= f.z();
+    j.f0X -= f.x();
+    j.f0Y -= f.y();
+    j.f0Z -= f.z();
 }

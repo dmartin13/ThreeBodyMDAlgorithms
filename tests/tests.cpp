@@ -902,11 +902,11 @@ TEST(utility, test_particle_constructor)
 TEST(utility, test_particle_reset)
 {
     Utility::Particle p;
-    p.fX = p.fY = p.fZ = 0.1;
+    p.f1X = p.f1Y = p.f1Z = 0.1;
     p.ResetForce();
-    EXPECT_DOUBLE_EQ(p.fX, 0.);
-    EXPECT_DOUBLE_EQ(p.fY, 0.);
-    EXPECT_DOUBLE_EQ(p.fZ, 0.);
+    EXPECT_DOUBLE_EQ(p.f1X, 0.);
+    EXPECT_DOUBLE_EQ(p.f1Y, 0.);
+    EXPECT_DOUBLE_EQ(p.f1Z, 0.);
 }
 
 TEST(utility, test_particle_GetR)

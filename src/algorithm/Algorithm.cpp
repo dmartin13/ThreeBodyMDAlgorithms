@@ -9,6 +9,7 @@ void Algorithm::Init(std::shared_ptr<Simulation> simulation)
     this->simulation = simulation;
     this->mpiParticleType = simulation->GetMPIParticleType();
     this->potential = this->simulation->GetTriwisePotential();
+    this->pairwisePotential = this->simulation->GetPairwisePotential();
     this->worldSize = this->simulation->GetTopology()->GetWorldSize();
     this->worldRank = this->simulation->GetTopology()->GetWorldRank();
 #ifdef PROFILE_3BMDA
@@ -243,21 +244,13 @@ void Algorithm::SumUpParticles(std::vector<Utility::Particle> &b0, std::vector<U
     start = std::chrono::system_clock::now();
 #endif
     for (size_t i = 0; i < b0.size(); i++) {
-        b0[i].fX += b1[i].fX + b2[i].fX;
-        b0[i].fY += b1[i].fY + b2[i].fY;
-        b0[i].fZ += b1[i].fZ + b2[i].fZ;
+        b0[i].f0X += b1[i].f0X + b2[i].f0X;
+        b0[i].f0Y += b1[i].f0Y + b2[i].f0Y;
+        b0[i].f0Z += b1[i].f0Z + b2[i].f0Z;
 
-        /*
-        Vec3Dd v0(b0[i].fX, b0[i].fY, b0[i].fZ);
-        Vec3Dd v1(b1[i].fX, b1[i].fY, b1[i].fZ);
-        Vec3Dd v2(b2[i].fX, b2[i].fY, b2[i].fZ);
-
-        v0 += v1 += v2;
-
-        b0[i].fX = v0.get_x();
-        b0[i].fY = v0.get_y();
-        b0[i].fZ = v0.get_z();
-        */
+        b0[i].f0X += b1[i].f0X + b2[i].f0X;
+        b0[i].f0Y += b1[i].f0Y + b2[i].f0Y;
+        b0[i].f0Z += b1[i].f0Z + b2[i].f0Z;
     }
 #ifdef PROFILE_3BMDA
     end = std::chrono::system_clock::now();
@@ -268,6 +261,65 @@ void Algorithm::SumUpParticles(std::vector<Utility::Particle> &b0, std::vector<U
     }
     this->times["SumUpParticles"].second.push_back(elapsed_time.count());
 #endif
+}
+
+void Algorithm::SumUpParticles(std::vector<Utility::Particle> &b0, std::vector<Utility::Particle> &b1)
+{
+#ifdef PROFILE_3BMDA
+    std::chrono::time_point<std::chrono::system_clock> start;
+    std::chrono::time_point<std::chrono::system_clock> end;
+    start = std::chrono::system_clock::now();
+#endif
+    for (size_t i = 0; i < b0.size(); i++) {
+        b0[i].f0X += b1[i].f0X;
+        b0[i].f0Y += b1[i].f0Y;
+        b0[i].f0Z += b1[i].f0Z;
+
+        b0[i].f1X += b1[i].f1X;
+        b0[i].f1Y += b1[i].f1Y;
+        b0[i].f1Z += b1[i].f1Z;
+    }
+#ifdef PROFILE_3BMDA
+    end = std::chrono::system_clock::now();
+    auto elapsed_time = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
+    bool hasKey = this->times.count("SumUpParticles");
+    if (!hasKey) {
+        this->times["SumUpParticles"] = std::make_pair(0, std::vector<int64_t>());
+    }
+    this->times["SumUpParticles"].second.push_back(elapsed_time.count());
+#endif
+}
+
+std::tuple<uint64_t, uint64_t> Algorithm::CalculatePairwiseInteractions(std::vector<Utility::Particle> &b0,
+                                                                        std::vector<Utility::Particle> &b1, int b0Owner,
+                                                                        int b1Owner)
+{
+    return calculatePairwiseInteractions(b0, b1, b0Owner, b1Owner, 0, -1, -1, Eigen::Array3d(-1));
+}
+
+std::tuple<uint64_t, uint64_t> Algorithm::calculatePairwiseInteractions(std::vector<Utility::Particle> &b0,
+                                                                        std::vector<Utility::Particle> &b1, int b0Owner,
+                                                                        int b1Owner, int b0Start, int b0NumSteps,
+                                                                        double cutoff,
+                                                                        Eigen::Array3d physicalDomainSize)
+{
+    uint64_t numActParticleInteractions = 0;
+    uint64_t numPossibleParticleInteractions = 0;
+    double sqrCutoff = cutoff * cutoff;
+    for (size_t i = b0Start; i < (b0NumSteps != -1 ? (size_t)(b0Start + b0NumSteps) : b0.size()); ++i) {
+        if (b0[i].isDummy) {
+            continue;
+        }
+        int b1LoopIndex = b1Owner == b0Owner ? i + 1 : 0;
+        for (size_t j = b1LoopIndex; j < b1.size(); ++j) {
+            if (b1[j].isDummy) {
+                continue;
+            }
+            pairwisePotential->CalculateForces(b0[i], b1[j]);
+        }
+    }
+
+    return std::tuple(numActParticleInteractions, numPossibleParticleInteractions);
 }
 
 #ifdef TESTS_3BMDA

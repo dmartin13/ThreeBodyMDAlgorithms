@@ -13,21 +13,26 @@ namespace Utility
         double pX, pY, pZ;
         double vX, vY, vZ;
         double aX, aY, aZ;
-        double fX, fY, fZ;
+        double f0X, f0Y, f0Z;
+        double f1X, f1Y, f1Z;
         double mass;
         bool isDummy;
 
         Particle()
-            : ID(-1), pX(0.0), pY(0.0), pZ(0.0), vX(0.0), vY(0.0), vZ(0.0), aX(0.0), aY(0.0), aZ(0.0), fX(0.0), fY(0.0),
-              fZ(0.0), mass(0), isDummy(false)
+            : ID(-1), pX(0.0), pY(0.0), pZ(0.0), vX(0.0), vY(0.0), vZ(0.0), aX(0.0), aY(0.0), aZ(0.0), f0X(0.0),
+              f0Y(0.0), f0Z(0.0), f1X(0.0), f1Y(0.0), f1Z(0.0), mass(0), isDummy(false)
         {}
         Particle(bool isDummy) : isDummy(isDummy) {}
         Particle(int ID, double pX, double pY, double pZ, double vX, double vY, double vZ, double aX, double aY,
                  double aZ, double mass)
-            : ID(ID), pX(pX), pY(pY), pZ(pZ), vX(vX), vY(vY), vZ(vZ), aX(aX), aY(aY), aZ(aZ), fX(0.0), fY(0.0), fZ(0.0),
-              mass(mass), isDummy(false)
+            : ID(ID), pX(pX), pY(pY), pZ(pZ), vX(vX), vY(vY), vZ(vZ), aX(aX), aY(aY), aZ(aZ), f0X(0.0), f0Y(0.0),
+              f0Z(0.0), f1X(0.0), f1Y(0.0), f1Z(0.0), mass(mass), isDummy(false)
         {}
-        void ResetForce() { fX = fY = fZ = 0.0; }
+        void ResetForce()
+        {
+            f0X = f0Y = f0Z = 0.0;
+            f1X = f1Y = f1Z = 0.0;
+        }
 
         std::string toString()
         {
@@ -43,15 +48,10 @@ namespace Utility
             Eigen::Vector3d vel(vX, vY, vZ);
             Eigen::Vector3d acc(aX, aX, aX);
             Eigen::Vector3d newPos = pos + vel * dt + acc * (dt * dt * 0.5);
-            // Eigen::Vector3d newVel = vel + acc * dt;
 
             pX = newPos.x();
             pY = newPos.y();
             pZ = newPos.z();
-
-            // vX = newVel.x();
-            // vY = newVel.y();
-            // vZ = newVel.z();
         }
 
         void Update(double dt, Eigen::Vector3d gForce)
@@ -63,31 +63,15 @@ namespace Utility
             Eigen::Vector3d pos(pX, pY, pZ);
             Eigen::Vector3d vel(vX, vY, vZ);
             Eigen::Vector3d acc(aX, aX, aX);
-            Eigen::Vector3d f(fX, fY, fZ);
+            Eigen::Vector3d f0(f0X, f0Y, f0Z);
+            Eigen::Vector3d f1(f1X, f1Y, f1Z);
 
             // Eigen::Vector3d dragForce = 0.5 * f.cwiseProduct(vel.cwiseProduct(vel));
-            Eigen::Vector3d dragAcc = f / mass;
+            Eigen::Vector3d dragAcc = f0 / mass;
             // Eigen::Vector3d dragAcc = dragForce / mass;
             Eigen::Vector3d newAcc = gForce - dragAcc;
 
-            // Eigen::Vector3d newPos = pos + vel * dt + newAcc * (dt * dt * 0.5);
-
             Eigen::Vector3d newVel = vel + newAcc * (dt * 0.5);
-
-            // pX = newPos.x();
-            // pY = newPos.y();
-            // pZ = newPos.z();
-
-            // this part is just added here so we move our particles after the first iteration... just for testing
-            // purpose. remove this for production
-            // {
-            //     Eigen::Vector3d newPos = pos + newVel * dt + newAcc * (dt * dt * 0.5);
-            //     // Eigen::Vector3d newVel = vel + acc * dt;
-
-            //     pX = newPos.x();
-            //     pY = newPos.y();
-            //     pZ = newPos.z();
-            // }
 
             vX = newVel.x();
             vY = newVel.y();
@@ -125,13 +109,13 @@ namespace Utility
         {
             // create MPI struct
             MPI_Datatype mpiParticleType;
-            const int nitemsParticle = 15;
-            int blocklengthsParticle[15] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
-            MPI_Datatype types[15] = {MPI_INT,    MPI_DOUBLE, MPI_DOUBLE, MPI_DOUBLE, MPI_DOUBLE,
-                                      MPI_DOUBLE, MPI_DOUBLE, MPI_DOUBLE, MPI_DOUBLE, MPI_DOUBLE,
-                                      MPI_DOUBLE, MPI_DOUBLE, MPI_DOUBLE, MPI_DOUBLE, MPI_C_BOOL};
+            const int nitemsParticle = 18;
+            int blocklengthsParticle[18] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+            MPI_Datatype types[18] = {MPI_INT,    MPI_DOUBLE, MPI_DOUBLE, MPI_DOUBLE, MPI_DOUBLE, MPI_DOUBLE,
+                                      MPI_DOUBLE, MPI_DOUBLE, MPI_DOUBLE, MPI_DOUBLE, MPI_DOUBLE, MPI_DOUBLE,
+                                      MPI_DOUBLE, MPI_DOUBLE, MPI_DOUBLE, MPI_DOUBLE, MPI_DOUBLE, MPI_C_BOOL};
 
-            MPI_Aint offsetsParticle[15];
+            MPI_Aint offsetsParticle[18];
 
             offsetsParticle[0] = offsetof(Utility::Particle, ID);
             offsetsParticle[1] = offsetof(Utility::Particle, pX);
@@ -143,11 +127,14 @@ namespace Utility
             offsetsParticle[7] = offsetof(Utility::Particle, aX);
             offsetsParticle[8] = offsetof(Utility::Particle, aY);
             offsetsParticle[9] = offsetof(Utility::Particle, aZ);
-            offsetsParticle[10] = offsetof(Utility::Particle, fX);
-            offsetsParticle[11] = offsetof(Utility::Particle, fY);
-            offsetsParticle[12] = offsetof(Utility::Particle, fZ);
-            offsetsParticle[13] = offsetof(Utility::Particle, mass);
-            offsetsParticle[14] = offsetof(Utility::Particle, isDummy);
+            offsetsParticle[10] = offsetof(Utility::Particle, f0X);
+            offsetsParticle[11] = offsetof(Utility::Particle, f0Y);
+            offsetsParticle[12] = offsetof(Utility::Particle, f0Z);
+            offsetsParticle[13] = offsetof(Utility::Particle, f1X);
+            offsetsParticle[14] = offsetof(Utility::Particle, f1Y);
+            offsetsParticle[15] = offsetof(Utility::Particle, f1Z);
+            offsetsParticle[16] = offsetof(Utility::Particle, mass);
+            offsetsParticle[17] = offsetof(Utility::Particle, isDummy);
 
             MPI_Type_create_struct(nitemsParticle, blocklengthsParticle, offsetsParticle, types, &mpiParticleType);
 
