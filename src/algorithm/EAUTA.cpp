@@ -256,6 +256,8 @@ void EAUTA::sendBackParticles() {
     this->b2Owner = this->worldRank;
 }
 
+std::tuple<uint64_t, uint64_t> EAUTA::SimulationStep() { return SimulationStep(ForceType::TwoAndThreeBody); }
+
 std::tuple<uint64_t, uint64_t> EAUTA::SimulationStep(ForceType forceType) {
     // TODO: avoid this copy
     this->b1 = this->simulation->GetDecomposition()->GetMyParticles();

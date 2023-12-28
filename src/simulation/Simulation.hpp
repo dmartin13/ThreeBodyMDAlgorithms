@@ -30,11 +30,11 @@ private:
     void writeSimulationStepToCSV(std::string file);
 
 public:
-    Simulation(int iterations, std::shared_ptr<Algorithm> algorithm, std::shared_ptr<Topology> topology,
-               std::shared_ptr<PairwisePotential> pairwisepotential, std::shared_ptr<TriwisePotential> triwisepotential,
-               std::shared_ptr<DomainDecomposition> decomposition, MPI_Datatype* mpiParticleType,
-               std::vector<Utility::Particle>& particles, double dt, Eigen::Vector3d gForce,
-               std::string csvOutput = "");
+    Simulation(int iterations, int respaStepSize, std::shared_ptr<Algorithm> algorithm,
+               std::shared_ptr<Topology> topology, std::shared_ptr<PairwisePotential> pairwisepotential,
+               std::shared_ptr<TriwisePotential> triwisepotential, std::shared_ptr<DomainDecomposition> decomposition,
+               MPI_Datatype* mpiParticleType, std::vector<Utility::Particle>& particles, double dt,
+               Eigen::Vector3d gForce, std::string csvOutput = "");
     virtual ~Simulation();
 
     void Start();

@@ -1,14 +1,14 @@
 #include "Simulation.hpp"
 
-Simulation::Simulation(int iterations, std::shared_ptr<Algorithm> algorithm, std::shared_ptr<Topology> topology,
-                       std::shared_ptr<PairwisePotential> pairwisepotential,
+Simulation::Simulation(int iterations, int respaStepSize, std::shared_ptr<Algorithm> algorithm,
+                       std::shared_ptr<Topology> topology, std::shared_ptr<PairwisePotential> pairwisepotential,
                        std::shared_ptr<TriwisePotential> triwisepotential,
                        std::shared_ptr<DomainDecomposition> decomposition, MPI_Datatype* mpiParticleType,
                        std::vector<Utility::Particle>& particles, double dt, Eigen::Vector3d gForce,
                        std::string csvOutput)
-    : iterations(iterations), algorithm(algorithm), topology(topology), pairwisepotential(pairwisepotential),
-      triwisepotential(triwisepotential), decomposition(decomposition), mpiParticleType(mpiParticleType),
-      particles(particles), dt(dt), gForce(gForce), csvOutput(csvOutput) {}
+    : iterations(iterations), respaStepSize(respaStepSize), algorithm(algorithm), topology(topology),
+      pairwisepotential(pairwisepotential), triwisepotential(triwisepotential), decomposition(decomposition),
+      mpiParticleType(mpiParticleType), particles(particles), dt(dt), gForce(gForce), csvOutput(csvOutput) {}
 
 void Simulation::Init() {
     std::shared_ptr<Simulation> simulationPtr = shared_from_this();
@@ -30,7 +30,7 @@ std::shared_ptr<DomainDecomposition> Simulation::GetDecomposition() { return thi
 
 void Simulation::Start() {
     // TODO: get this from config
-    const bool respaActive = true;
+    const bool respaActive = respaStepSize > 0;
 
     for (int i = 0; i < iterations; ++i) {
 #ifdef MEASURESIMSTEP_3BMDA

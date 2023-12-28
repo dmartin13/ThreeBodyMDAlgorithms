@@ -41,4 +41,5 @@ public:
     void Init(std::shared_ptr<Simulation> simulation) override;
 
     std::tuple<uint64_t, uint64_t> SimulationStep(ForceType forceType) override;
+    std::tuple<uint64_t, uint64_t> SimulationStep() override;
 };

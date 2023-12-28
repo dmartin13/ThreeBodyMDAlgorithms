@@ -18,8 +18,6 @@
 #include "topology/Topology.hpp"
 #include "utility/utility.hpp"
 
-#define MAX_NUM_ELEMENTS 2666666667  // num of elements (int i, int j, int k) that use up 32 GB of memory
-
 class Algorithm {
 protected:
     std::shared_ptr<Simulation> simulation;

@@ -10,6 +10,7 @@
 namespace Utility {
     struct cliArguments {
         int iterations;
+        int respaStepSize;
         double cutoff;
         double deltaT;
         std::string inputCSV;
@@ -27,8 +28,9 @@ namespace Utility {
         std::cout << "Help: \n"
                   << "Options:\n"
                   << "\t-h,--help\t\tShow this help message\n"
-                  << "\t-a,--algorithm\t\talgorithm to use (\"nata\", \"p3bca\", \"auta\")\n"
+                  << "\t-a,--algorithm\t\talgorithm to use (\"nata\", \"p3bca\", \"auta\", \"eauta\")\n"
                   << "\t-i,--iterations\t\tnum of iterations to simulate\n"
+                  << "\t-r,--respaStepSize\tr-RESPA Step Size\n"
                   << "\t-d,--delta\t\tduration of one simulation step\n"
                   << "\t-gx,--gravityZ\t\tgravitational force in x-direction\n"
                   << "\t-gy,--gravityY\t\tgravitational force in y-direction\n"
@@ -66,6 +68,14 @@ namespace Utility {
                         value = args[i + 1];
                         a.iterations = std::stoi(value);
                         i++;
+                    } else if (flag.compare("r") == 0 || flag.compare("-respaStepSize") == 0) {
+                        if (args.size() <= (size_t)(i + 1)) {
+                            a.printHelp();
+                            exit(1);
+                        }
+                        value = args[i + 1];
+                        a.respaStepSize = std::stoi(value);
+                        i++;
                     } else if (flag.compare("a") == 0 || flag.compare("-algorithm") == 0) {
                         if (args.size() <= (size_t)(i + 1)) {
                             a.printHelp();
@@ -78,6 +88,8 @@ namespace Utility {
                             a.algorithm = AlgorithmType::P3BCAType;
                         } else if (value.compare("auta") == 0) {
                             a.algorithm = AlgorithmType::AUTAType;
+                        } else if (value.compare("eauta") == 0) {
+                            a.algorithm = AlgorithmType::EAUTAType;
                         } else {
                             a.printHelp();
                             exit(1);

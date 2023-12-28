@@ -99,6 +99,33 @@ set_target_properties(
   particlegenerator PROPERTIES RUNTIME_OUTPUT_DIRECTORY
                                ${CMAKE_BINARY_DIR}/executables/tools)
 
+# MAINRESPA
+
+include_directories(SYSTEM ${MPI_INCLUDE_PATH})
+
+file(GLOB_RECURSE MAINRESPA_SOURCES CONFIGURE_DEPENDS "src/*.hpp" "src/*.cpp")
+
+add_executable(mainrespa mainrespa.cpp ${MAIN_SOURCES})
+target_include_directories(mainrespa PRIVATE src)
+
+target_link_libraries(mainrespa ${MPI_C_LIBRARIES})
+target_link_libraries(mainrespa Eigen3::Eigen)
+target_link_libraries(mainrespa OpenMP::OpenMP_CXX)
+
+if(PROFILE_3BMDA)
+  target_compile_definitions(mainrespa PUBLIC PROFILE_3BMDA)
+endif()
+if(USE_OMP)
+  message(STATUS "add USE_OMP compile definition")
+  target_compile_definitions(mainrespa PUBLIC USE_OMP)
+endif()
+if(MEASURESIMSTEP_3BMDA)
+  target_compile_definitions(mainrespa PUBLIC MEASURESIMSTEP_3BMDA)
+endif()
+
+set_target_properties(mainrespa PROPERTIES RUNTIME_OUTPUT_DIRECTORY
+                                      ${CMAKE_BINARY_DIR}/executables)
+
 # TESTS
 
 if(TESTS_3BMDA)
