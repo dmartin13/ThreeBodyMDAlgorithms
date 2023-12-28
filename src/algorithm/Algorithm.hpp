@@ -6,6 +6,8 @@
 #include <chrono>
 //#endif
 
+#include <utility/enums.hpp>
+
 #include "MPIReporter.hpp"
 #include "decomposition/DomainDecomposition.hpp"
 #include "fwd.hpp"
@@ -65,6 +67,7 @@ public:
 
     virtual void Init(std::shared_ptr<Simulation> simulation);
     virtual std::tuple<uint64_t, uint64_t> SimulationStep() = 0;
+    virtual std::tuple<uint64_t, uint64_t> SimulationStep(ForceType forceType) = 0;
 
     std::tuple<uint64_t, uint64_t> CalculateInteractions(std::vector<Utility::Particle> &b0,
                                                          std::vector<Utility::Particle> &b1,

@@ -1,7 +1,6 @@
 #include "Potential.hpp"
 
-void Potential::Init(std::shared_ptr<Simulation> simulation)
-{
+void Potential::Init(std::shared_ptr<Simulation> simulation) {
     this->simulation = simulation;
 #ifdef PROFILE_3BMDA
     this->counter = 0;
@@ -10,8 +9,7 @@ void Potential::Init(std::shared_ptr<Simulation> simulation)
 }
 
 #ifdef PROFILE_3BMDA
-std::map<std::string, std::pair<char, double>> Potential::GetAvgCalcTime()
-{
+std::map<std::string, std::pair<char, double>> Potential::GetAvgCalcTime() {
     std::map<std::string, std::pair<char, double>> time;
 
     bool hasKey = time.count("CalculateForces");
@@ -22,8 +20,7 @@ std::map<std::string, std::pair<char, double>> Potential::GetAvgCalcTime()
 
     return time;
 }
-void Potential::ResetTime()
-{
+void Potential::ResetTime() {
     this->counter = 0;
     this->timeAcc = 0;
 }

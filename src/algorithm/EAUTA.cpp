@@ -4,8 +4,7 @@ EAUTA::EAUTA() {}
 
 EAUTA::~EAUTA() {}
 
-void EAUTA::Init(std::shared_ptr<Simulation> simulation)
-{
+void EAUTA::Init(std::shared_ptr<Simulation> simulation) {
     Algorithm::Init(simulation);
 
     // in this algorithm we copy b0, as this buffer is also shifted around
@@ -21,8 +20,7 @@ void EAUTA::Init(std::shared_ptr<Simulation> simulation)
     this->b2Owner = this->worldRank;
 }
 
-int EAUTA::shiftRight(std::vector<Utility::Particle>& buf, int owner)
-{
+int EAUTA::shiftRight(std::vector<Utility::Particle>& buf, int owner) {
     MPI_Status status;
 
     MPI_Sendrecv_replace(buf.data(), buf.size(), *this->mpiParticleType, this->rightNeighbor, owner, this->leftNeighbor,
@@ -34,8 +32,7 @@ int EAUTA::shiftRight(std::vector<Utility::Particle>& buf, int owner)
     return status.MPI_TAG;
 }
 
-int EAUTA::shiftLeft(std::vector<Utility::Particle>& buf, int owner)
-{
+int EAUTA::shiftLeft(std::vector<Utility::Particle>& buf, int owner) {
     MPI_Status status;
 
     MPI_Sendrecv_replace(buf.data(), buf.size(), *this->mpiParticleType, this->leftNeighbor, owner, this->rightNeighbor,
@@ -47,8 +44,7 @@ int EAUTA::shiftLeft(std::vector<Utility::Particle>& buf, int owner)
     return status.MPI_TAG;
 }
 
-std::tuple<uint64_t, uint64_t> EAUTA::calculateOneThirdOfInteractions(int thirdID)
-{
+std::tuple<uint64_t, uint64_t> EAUTA::calculateOneThirdOfInteractions(int thirdID) {
     std::vector<Utility::Particle>* b0Sorted = nullptr;
     std::vector<Utility::Particle>* b1Sorted = nullptr;
     std::vector<Utility::Particle>* b2Sorted = nullptr;
@@ -118,8 +114,7 @@ std::tuple<uint64_t, uint64_t> EAUTA::calculateOneThirdOfInteractions(int thirdI
 
 std::tuple<uint64_t, uint64_t> EAUTA::calculateOneHalfOfInteractions(std::vector<Utility::Particle>& b0,
                                                                      std::vector<Utility::Particle>& b1, int b0Owner,
-                                                                     int b1Owner, int halfID)
-{
+                                                                     int b1Owner, int halfID) {
     std::vector<Utility::Particle>* b0Sorted = nullptr;
     std::vector<Utility::Particle>* b1Sorted = nullptr;
     int b0OwnerSorted;
@@ -150,30 +145,41 @@ std::tuple<uint64_t, uint64_t> EAUTA::calculateOneHalfOfInteractions(std::vector
                                                Eigen::Array3d{0, 0, 0});
 }
 
-std::vector<Utility::Particle>* EAUTA::pickBuffer(int i)
-{
+std::vector<Utility::Particle>* EAUTA::pickBuffer(int i) {
     switch (i) {
-        case 0: return &this->b0; break;
-        case 1: return &this->b1; break;
-        case 2: return &this->b2; break;
+        case 0:
+            return &this->b0;
+            break;
+        case 1:
+            return &this->b1;
+            break;
+        case 2:
+            return &this->b2;
+            break;
 
-        default: exit(1);
+        default:
+            exit(1);
     }
 }
 
-int& EAUTA::getBufOwner(int i)
-{
+int& EAUTA::getBufOwner(int i) {
     switch (i) {
-        case 0: return this->b0Owner; break;
-        case 1: return this->b1Owner; break;
-        case 2: return this->b2Owner; break;
+        case 0:
+            return this->b0Owner;
+            break;
+        case 1:
+            return this->b1Owner;
+            break;
+        case 2:
+            return this->b2Owner;
+            break;
 
-        default: exit(1);
+        default:
+            exit(1);
     }
 }
 
-void EAUTA::sendBackParticles()
-{
+void EAUTA::sendBackParticles() {
     MPI_Request requestSend0, requestSend1, requestSend2;
     MPI_Request requestRecv0, requestRecv1, requestRecv2;
 
@@ -250,11 +256,7 @@ void EAUTA::sendBackParticles()
     this->b2Owner = this->worldRank;
 }
 
-std::tuple<uint64_t, uint64_t> EAUTA::SimulationStep(InteractionType interactionType)
-{
-    // reset all forces in b0 to 0
-    this->simulation->GetDecomposition()->ResetForces();
-
+std::tuple<uint64_t, uint64_t> EAUTA::SimulationStep(ForceType forceType) {
     // TODO: avoid this copy
     this->b1 = this->simulation->GetDecomposition()->GetMyParticles();
 
@@ -267,7 +269,7 @@ std::tuple<uint64_t, uint64_t> EAUTA::SimulationStep(InteractionType interaction
 
     // special case for 1 processor
     if (worldSize == 1) {
-        if (interactionType == InteractionType::ThreeBody or interactionType == InteractionType::TwoAndThreeBody) {
+        if (forceType == ForceType::ThreeBody or forceType == ForceType::TwoAndThreeBody) {
             CalculateInteractions(this->b1, this->b1, this->b1, this->b1Owner, this->b1Owner, this->b1Owner);
         }
         CalculatePairwiseInteractions(b1, b1, b1Owner, b1Owner);
@@ -279,7 +281,7 @@ std::tuple<uint64_t, uint64_t> EAUTA::SimulationStep(InteractionType interaction
     if (worldSize == 2) {
         b2 = b1;
         this->b2Owner = shiftLeft(b2, worldRank);
-        if (interactionType == InteractionType::ThreeBody or interactionType == InteractionType::TwoAndThreeBody) {
+        if (forceType == ForceType::ThreeBody or forceType == ForceType::TwoAndThreeBody) {
             CalculateInteractions(this->b1, this->b1, this->b1, this->b1Owner, this->b1Owner, this->b1Owner);
             CalculateInteractions(this->b1, this->b1, this->b2, this->b1Owner, this->b1Owner, this->b2Owner);
         }
@@ -304,7 +306,7 @@ std::tuple<uint64_t, uint64_t> EAUTA::SimulationStep(InteractionType interaction
         this->b0Owner = shiftRight(b0, worldRank);
         this->b2Owner = shiftLeft(b2, worldRank);
 
-        if (interactionType == InteractionType::ThreeBody or interactionType == InteractionType::TwoAndThreeBody) {
+        if (forceType == ForceType::ThreeBody or forceType == ForceType::TwoAndThreeBody) {
             CalculateInteractions(this->b1, this->b1, this->b1, this->b1Owner, this->b1Owner, this->b1Owner);
             CalculateInteractions(this->b1, this->b1, this->b2, this->b1Owner, this->b1Owner, this->b2Owner);
             CalculateInteractions(this->b0, this->b0, this->b2, this->b0Owner, this->b0Owner, this->b2Owner);
@@ -348,8 +350,7 @@ std::tuple<uint64_t, uint64_t> EAUTA::SimulationStep(InteractionType interaction
             } else {
                 // in the very first step (substep 1 of phase 1) we incorporate some 3-body and 2-body interactions we
                 // can calculate from the buffers we already have
-                if (interactionType == InteractionType::ThreeBody or
-                    interactionType == InteractionType::TwoAndThreeBody) {
+                if (forceType == ForceType::ThreeBody or forceType == ForceType::TwoAndThreeBody) {
                     CalculateInteractions(this->b1, this->b1, this->b1, this->b1Owner, this->b1Owner, this->b1Owner);
                     CalculateInteractions(this->b1, this->b1, this->b2, this->b1Owner, this->b1Owner, this->b2Owner);
                     CalculateInteractions(this->b0, this->b0, this->b2, this->b0Owner, this->b0Owner, this->b2Owner);
@@ -362,14 +363,13 @@ std::tuple<uint64_t, uint64_t> EAUTA::SimulationStep(InteractionType interaction
             if (s == this->worldSize - 3) {
                 // See Embedded AUT Algorithm paper: In the first phase we incorporate also some additional 3-body
                 // calculations after buffer 0 is shifted
-                if (interactionType == InteractionType::ThreeBody or
-                    interactionType == InteractionType::TwoAndThreeBody) {
+                if (forceType == ForceType::ThreeBody or forceType == ForceType::TwoAndThreeBody) {
                     CalculateInteractions(this->b0, this->b1, this->b1, this->b0Owner, this->b1Owner, this->b1Owner);
                 }
             }
 
             // normal interactions between all three buffers
-            if (interactionType == InteractionType::ThreeBody or interactionType == InteractionType::TwoAndThreeBody) {
+            if (forceType == ForceType::ThreeBody or forceType == ForceType::TwoAndThreeBody) {
                 CalculateInteractions(this->b0, this->b1, this->b2, this->b0Owner, this->b1Owner, this->b2Owner);
             }
 
@@ -388,8 +388,7 @@ std::tuple<uint64_t, uint64_t> EAUTA::SimulationStep(InteractionType interaction
 
             // since two-body interactions are fully embedded into the first phase of the algorithm we can stop the
             // algorithm here, if we have a non-respa iteration
-            if (not(interactionType == InteractionType::ThreeBody or
-                    interactionType == InteractionType::TwoAndThreeBody) and
+            if (not(forceType == ForceType::ThreeBody or forceType == ForceType::TwoAndThreeBody) and
                 pairCounter >= numStepsPairwise) {
                 return std::tuple(numBufferInteractions, numParticleInteractionsAcc);
             }

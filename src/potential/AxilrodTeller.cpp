@@ -2,8 +2,7 @@
 
 AxilrodTeller::AxilrodTeller(double nu) : nu(nu) {}
 
-void AxilrodTeller::CalculateForces(Utility::Particle &i, Utility::Particle &j, Utility::Particle &k)
-{
+void AxilrodTeller::CalculateForces(Utility::Particle &i, Utility::Particle &j, Utility::Particle &k) {
     /*
     #ifdef PROFILE_3BMDA
         std::chrono::time_point<std::chrono::system_clock> start;

@@ -1,11 +1,9 @@
 #include "LennardJones.hpp"
 
 LennardJones::LennardJones(double epsilon, double sigma)
-    : _epsilon(epsilon), _sigma(sigma), _sigmaSquared(sigma * sigma), _epsilon24(epsilon * 24)
-{}
+    : _epsilon(epsilon), _sigma(sigma), _sigmaSquared(sigma * sigma), _epsilon24(epsilon * 24) {}
 
-void LennardJones::CalculateForces(Utility::Particle &i, Utility::Particle &j)
-{
+void LennardJones::CalculateForces(Utility::Particle &i, Utility::Particle &j) {
     auto sigmaSquared = _sigmaSquared;
     auto epsilon24 = _epsilon24;
     // auto shift6 = _shift6;

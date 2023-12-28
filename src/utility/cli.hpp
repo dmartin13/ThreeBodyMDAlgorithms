@@ -7,8 +7,7 @@
 
 #include "enums.hpp"
 
-namespace Utility
-{
+namespace Utility {
     struct cliArguments {
         int iterations;
         double cutoff;
@@ -24,8 +23,7 @@ namespace Utility
         void printHelp();
     };
 
-    void cliArguments::printHelp()
-    {
+    void cliArguments::printHelp() {
         std::cout << "Help: \n"
                   << "Options:\n"
                   << "\t-h,--help\t\tShow this help message\n"
@@ -44,8 +42,7 @@ namespace Utility
                   << "\t-c,--cutoff\t\tcutoff distance" << std::endl;
     }
 
-    cliArguments cliParse(std::vector<std::string> args)
-    {
+    cliArguments cliParse(std::vector<std::string> args) {
         cliArguments a;
         std::string flag, value;
 

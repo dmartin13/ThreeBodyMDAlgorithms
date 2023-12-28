@@ -18,8 +18,7 @@ std::vector<Utility::Particle> gaussParticles;
 std::vector<Utility::Particle> closestpackedParticles;
 std::vector<Utility::Particle> clusteredgaussParticles;
 
-void generateParticles()
-{
+void generateParticles() {
     int numParticles = 1000;
     std::array<double, 3> velocity = {0, 0, 0};
     std::array<double, 3> boxLength = {10, 10, 10};
@@ -33,16 +32,11 @@ void generateParticles()
     const std::array<double, 3> distributionStdDev = {0.5, 0.5, 0.5};
     int numClusters = 25;
 
-    std::vector<std::tuple<int, double, double, double, double, double, double, double, double, double, double>>
-        uniformParticlesTuple;
-    std::vector<std::tuple<int, double, double, double, double, double, double, double, double, double, double>>
-        gridParticlesTuple;
-    std::vector<std::tuple<int, double, double, double, double, double, double, double, double, double, double>>
-        gaussParticlesTuple;
-    std::vector<std::tuple<int, double, double, double, double, double, double, double, double, double, double>>
-        closestpackedParticlesTuple;
-    std::vector<std::tuple<int, double, double, double, double, double, double, double, double, double, double>>
-        clusteredgaussParticlesTuple;
+    std::vector<std::tuple<int, double, double, double, double, double, double, double>> uniformParticlesTuple;
+    std::vector<std::tuple<int, double, double, double, double, double, double, double>> gridParticlesTuple;
+    std::vector<std::tuple<int, double, double, double, double, double, double, double>> gaussParticlesTuple;
+    std::vector<std::tuple<int, double, double, double, double, double, double, double>> closestpackedParticlesTuple;
+    std::vector<std::tuple<int, double, double, double, double, double, double, double>> clusteredgaussParticlesTuple;
 
     UniformGenerator uniformGenerator(numParticles, velocity, boxLength, bottomLeftCorner, mass, seed0, seed1);
     GridGenerator gridGenerator(numParticles, velocity, boxLength, bottomLeftCorner, mass, seed0, seed1,
@@ -80,11 +74,9 @@ struct CartRankTriplet {
 
     CartRankTriplet() : a0(0), a1(0), a2(0), b0(0), b1(0), b2(0), c0(0), c1(0), c2(0) {}
     CartRankTriplet(int a0, int a1, int a2, int b0, int b1, int b2, int c0, int c1, int c2)
-        : a0(a0), a1(a1), a2(a2), b0(b0), b1(b1), b2(b2), c0(c0), c1(c1), c2(c2)
-    {}
+        : a0(a0), a1(a1), a2(a2), b0(b0), b1(b1), b2(b2), c0(c0), c1(c1), c2(c2) {}
 
-    bool operator==(const CartRankTriplet& t) const
-    {
+    bool operator==(const CartRankTriplet& t) const {
         return ((a0 == t.a0 && a1 == t.a1 && a2 == t.a2) && (b0 == t.b0 && b1 == t.b1 && b2 == t.b2) &&
                 (c0 == t.c0 && c1 == t.c1 && c2 == t.c2)) ||
                ((a0 == t.a0 && a1 == t.a1 && a2 == t.a2) && (b0 == t.c0 && b1 == t.c1 && b2 == t.c2) &&
@@ -101,15 +93,13 @@ struct CartRankTriplet {
 
     bool operator!=(const CartRankTriplet& t) const { return !(this->operator==(t)); }
 
-    std::string toString()
-    {
+    std::string toString() {
         return "[(" + std::to_string(a0) + ", " + std::to_string(a1) + ", " + std::to_string(a2) + "), (" +
                std::to_string(b0) + ", " + std::to_string(b1) + ", " + std::to_string(b2) + "), (" +
                std::to_string(c0) + ", " + std::to_string(c1) + ", " + std::to_string(c2) + ")]";
     }
 
-    static MPI_Datatype GetMPIType()
-    {
+    static MPI_Datatype GetMPIType() {
         // create MPI struct
         MPI_Datatype mpiTripletType;
         const int nitemsTriplet = 9;
@@ -134,8 +124,7 @@ struct CartRankTriplet {
     }
 };
 
-std::shared_ptr<Simulation> createNATAContext(int iterations, double deltaT, Eigen::Vector3d gForce)
-{
+std::shared_ptr<Simulation> createNATAContext(int iterations, double deltaT, Eigen::Vector3d gForce) {
     // create topology
     std::shared_ptr<RingTopology> ringTopology = std::make_shared<RingTopology>();
 
@@ -154,14 +143,14 @@ std::shared_ptr<Simulation> createNATAContext(int iterations, double deltaT, Eig
     // std::shared_ptr<Potential> potential, std::shared_ptr<DomainDecomposition> decomposition,
     // MPI_Datatype* mpiParticleType, std::vector<Utility::Particle>& particles, double dt,
     // Eigen::Vector3d gForce
-    std::shared_ptr<Simulation> simulation = std::make_shared<Simulation>(
-        iterations, nata, ringTopology, lj, axilrodTeller, atomDecomposition, &mpiParticleType, particles, deltaT, gForce);
+    std::shared_ptr<Simulation> simulation =
+        std::make_shared<Simulation>(iterations, nata, ringTopology, lj, axilrodTeller, atomDecomposition,
+                                     &mpiParticleType, particles, deltaT, gForce);
     return simulation;
 }
 
 std::shared_ptr<Simulation> createP3BCAContext(int iterations, double deltaT, Eigen::Vector3d gForce, double cutoff,
-                                               std::vector<int> decomposition)
-{
+                                               std::vector<int> decomposition) {
     // create topology
     std::shared_ptr<CartTopology> cartTopology = std::make_shared<CartTopology>(decomposition);
 
@@ -186,8 +175,7 @@ std::shared_ptr<Simulation> createP3BCAContext(int iterations, double deltaT, Ei
     return simulation;
 }
 
-std::shared_ptr<Simulation> createAUTAContext(int iterations, double deltaT, Eigen::Vector3d gForce)
-{
+std::shared_ptr<Simulation> createAUTAContext(int iterations, double deltaT, Eigen::Vector3d gForce) {
     // create topology
     std::shared_ptr<RingTopology> ringTopology = std::make_shared<RingTopology>();
 
@@ -206,23 +194,22 @@ std::shared_ptr<Simulation> createAUTAContext(int iterations, double deltaT, Eig
     // std::shared_ptr<Potential> potential, std::shared_ptr<DomainDecomposition> decomposition,
     // MPI_Datatype* mpiParticleType, std::vector<Utility::Particle>& particles, double dt,
     // Eigen::Vector3d gForce
-    std::shared_ptr<Simulation> simulation = std::make_shared<Simulation>(
-        iterations, auta, ringTopology, lj, axilrodTeller, atomDecomposition, &mpiParticleType, particles, deltaT, gForce);
+    std::shared_ptr<Simulation> simulation =
+        std::make_shared<Simulation>(iterations, auta, ringTopology, lj, axilrodTeller, atomDecomposition,
+                                     &mpiParticleType, particles, deltaT, gForce);
     return simulation;
 }
 
 int periodicDistance(int x, int y, int dim) { return std::min(abs(x - y), dim - abs(x - y)); }
 
-Eigen::Array3i periodicDistanceA3i(Eigen::Array3i x, Eigen::Array3i y, int dim)
-{
+Eigen::Array3i periodicDistanceA3i(Eigen::Array3i x, Eigen::Array3i y, int dim) {
     return Eigen::Array3i(periodicDistance(x.x(), y.x(), dim), periodicDistance(x.y(), y.y(), dim),
                           periodicDistance(x.z(), y.z(), dim));
 }
 
 bool vLtS(Eigen::Array3i v, int scalar) { return (v.x() <= scalar) && (v.y() <= scalar) && (v.z() <= scalar); }
 
-bool vLtV(Eigen::Array3i x, Eigen::Array3i y)
-{
+bool vLtV(Eigen::Array3i x, Eigen::Array3i y) {
     if (x.x() != y.x()) {
         return x.x() < y.x();
     }
@@ -235,34 +222,29 @@ bool vLtV(Eigen::Array3i x, Eigen::Array3i y)
     return true;
 }
 
-int sgn(int value)
-{
+int sgn(int value) {
     if (value >= 0)
         return 1;
     else
         return -1;
 }
 
-int periodicDiff(int x, int y, int dim)
-{
+int periodicDiff(int x, int y, int dim) {
     return (abs(x - y) <= (dim / 2)) ? (x - y) : (sgn(y - x) * periodicDistance(x, y, dim));
 }
 
-Eigen::Array3i periodicDiffA3i(Eigen::Array3i x, Eigen::Array3i y, std::array<int, 3> dim)
-{
+Eigen::Array3i periodicDiffA3i(Eigen::Array3i x, Eigen::Array3i y, std::array<int, 3> dim) {
     return Eigen::Array3i(periodicDiff(x.x(), y.x(), dim[0]), periodicDiff(x.y(), y.y(), dim[1]),
                           periodicDiff(x.z(), y.z(), dim[2]));
 }
 
-bool customLt(Eigen::Array3i r, Eigen::Array3i u, Eigen::Array3i v, std::array<int, 3> dim)
-{
+bool customLt(Eigen::Array3i r, Eigen::Array3i u, Eigen::Array3i v, std::array<int, 3> dim) {
     Eigen::Vector3i diff0 = periodicDiffA3i(u, r, dim);
     Eigen::Vector3i diff1 = periodicDiffA3i(v, r, dim);
     return vLtV(diff0, diff1);
 }
 
-std::vector<Eigen::Array3i> getIntersectedCutoofWindow(std::vector<Eigen::Array3i>& a, std::vector<Eigen::Array3i>& b)
-{
+std::vector<Eigen::Array3i> getIntersectedCutoofWindow(std::vector<Eigen::Array3i>& a, std::vector<Eigen::Array3i>& b) {
     std::vector<Eigen::Array3i> intersected;
     for (Eigen::Array3i& r_a : a) {
         for (Eigen::Array3i& r_b : b) {
@@ -277,8 +259,7 @@ std::vector<Eigen::Array3i> getIntersectedCutoofWindow(std::vector<Eigen::Array3
 }
 
 void p3bca(std::vector<std::tuple<std::tuple<int, int, int>, std::vector<CartRankTriplet>>>& interactions,
-           std::array<int, 3> dims, std::array<int, 3> cutoffBoxes)
-{
+           std::array<int, 3> dims, std::array<int, 3> cutoffBoxes) {
     std::vector<std::tuple<Eigen::Array3i, std::vector<Eigen::Array3i>>> U;  // all processor ranks and cutoffwindows
 
     // generate all processor ranks
@@ -337,8 +318,7 @@ void p3bca(std::vector<std::tuple<std::tuple<int, int, int>, std::vector<CartRan
     }
 }
 
-std::vector<Utility::Triplet> generateAllUniqueTriplets(int numProc)
-{
+std::vector<Utility::Triplet> generateAllUniqueTriplets(int numProc) {
     std::vector<Utility::Triplet> triplets;
     for (int i = 0; i < numProc; i++) {
         for (int j = i; j < numProc; j++) {
@@ -350,145 +330,7 @@ std::vector<Utility::Triplet> generateAllUniqueTriplets(int numProc)
     return triplets;
 }
 
-/**
- * @brief Test the Atom Decomposition if we have the same particles in each step without simulationstep and without
- * gravity
- *
- */
-TEST(nata, test_decomposition)
-{
-    std::shared_ptr<Simulation> simulation = createNATAContext(0, 0.001, Eigen::Vector3d(0, 0, 0));
-    simulation->Init();
-
-    int myParticlesOldSize = simulation->GetDecomposition()->GetMyParticles().size();
-
-    simulation->GetDecomposition()->UpdatePredictorStage(simulation->GetDeltaT());
-    simulation->GetDecomposition()->Update(simulation->GetDeltaT(), simulation->GetGForce());
-
-    int myParticlesNewSize = simulation->GetDecomposition()->GetMyParticles().size();
-
-    GTEST_ASSERT_EQ(myParticlesOldSize, myParticlesNewSize);
-}
-
-/**
- * @brief Test the Atom Decomposition if we have the same particles in each step without simulationstep and without
- * gravity
- *
- */
-TEST(auta, test_decomposition)
-{
-    std::shared_ptr<Simulation> simulation = createAUTAContext(0, 0.001, Eigen::Vector3d(0, 0, 0));
-    simulation->Init();
-
-    int myParticlesOldSize = simulation->GetDecomposition()->GetMyParticles().size();
-
-    simulation->GetDecomposition()->UpdatePredictorStage(simulation->GetDeltaT());
-    simulation->GetDecomposition()->Update(simulation->GetDeltaT(), simulation->GetGForce());
-
-    int myParticlesNewSize = simulation->GetDecomposition()->GetMyParticles().size();
-
-    GTEST_ASSERT_EQ(myParticlesOldSize, myParticlesNewSize);
-}
-
-/**
- * @brief Test the Grid Decomposition if we have the same particles in each step without simulationstep and without
- * gravity
- *
- */
-TEST(p3bca, test_decomposition)
-{
-    int worldSize;
-    MPI_Comm_size(MPI_COMM_WORLD, &worldSize);
-
-    std::shared_ptr<Simulation> simulation =
-        createP3BCAContext(0, 1., Eigen::Vector3d(0, 0, 0), 0.5, Utility::getDecomposition(worldSize, decompositions));
-    simulation->Init();
-
-    int myParticlesOldSize = simulation->GetDecomposition()->GetMyParticles().size();
-
-    simulation->GetDecomposition()->UpdatePredictorStage(simulation->GetDeltaT());
-    simulation->GetDecomposition()->Update(simulation->GetDeltaT(), simulation->GetGForce());
-
-    int myParticlesNewSize = simulation->GetDecomposition()->GetMyParticles().size();
-
-    GTEST_ASSERT_EQ(myParticlesOldSize, myParticlesNewSize);
-}
-
-/**
- * @brief Test the Atom Decomposition if we have the same particles in each step with one simulation step
- *
- */
-TEST(nata, test_decomposition_with_step)
-{
-    std::shared_ptr<Simulation> simulation = createNATAContext(0, 0.001, Eigen::Vector3d(0, 0, 0));
-    simulation->Init();
-
-    int myParticlesOldSize = simulation->GetDecomposition()->GetMyParticles().size();
-
-    simulation->GetDecomposition()->UpdatePredictorStage(simulation->GetDeltaT());
-    MPI_Barrier(simulation->GetTopology()->GetComm());
-    simulation->GetAlgorithm()->SimulationStep();
-    MPI_Barrier(simulation->GetTopology()->GetComm());
-    simulation->GetDecomposition()->Update(simulation->GetDeltaT(), simulation->GetGForce());
-    MPI_Barrier(simulation->GetTopology()->GetComm());
-
-    int myParticlesNewSize = simulation->GetDecomposition()->GetMyParticles().size();
-
-    GTEST_ASSERT_EQ(myParticlesOldSize, myParticlesNewSize);
-}
-
-/**
- * @brief Test the Atom Decomposition if we have the same particles in each step with one simulation step
- *
- */
-TEST(auta, test_decomposition_with_step)
-{
-    std::shared_ptr<Simulation> simulation = createAUTAContext(0, 0.001, Eigen::Vector3d(0, 0, 0));
-    simulation->Init();
-
-    int myParticlesOldSize = simulation->GetDecomposition()->GetMyParticles().size();
-
-    simulation->GetDecomposition()->UpdatePredictorStage(simulation->GetDeltaT());
-    MPI_Barrier(simulation->GetTopology()->GetComm());
-    simulation->GetAlgorithm()->SimulationStep();
-    MPI_Barrier(simulation->GetTopology()->GetComm());
-    simulation->GetDecomposition()->Update(simulation->GetDeltaT(), simulation->GetGForce());
-    MPI_Barrier(simulation->GetTopology()->GetComm());
-
-    int myParticlesNewSize = simulation->GetDecomposition()->GetMyParticles().size();
-
-    GTEST_ASSERT_EQ(myParticlesOldSize, myParticlesNewSize);
-}
-
-/**
- * @brief Test the Grid Decomposition if we have the same particles in each step
- *
- */
-TEST(p3bca, test_decomposition_with_step)
-{
-    int worldSize;
-    MPI_Comm_size(MPI_COMM_WORLD, &worldSize);
-
-    std::shared_ptr<Simulation> simulation = createP3BCAContext(0, 1., Eigen::Vector3d(0, 0, 0), 0.5,
-                                                                Utility::getDecomposition(worldSize, decompositions));
-    simulation->Init();
-
-    int myParticlesOldSize = simulation->GetDecomposition()->GetMyParticles().size();
-
-    simulation->GetDecomposition()->UpdatePredictorStage(simulation->GetDeltaT());
-    MPI_Barrier(simulation->GetTopology()->GetComm());
-    simulation->GetAlgorithm()->SimulationStep();
-    MPI_Barrier(simulation->GetTopology()->GetComm());
-    simulation->GetDecomposition()->Update(simulation->GetDeltaT(), simulation->GetGForce());
-    MPI_Barrier(simulation->GetTopology()->GetComm());
-
-    int myParticlesNewSize = simulation->GetDecomposition()->GetMyParticles().size();
-
-    GTEST_ASSERT_EQ(myParticlesOldSize, myParticlesNewSize);
-}
-
-TEST(nata, test_num_interactions)
-{
+TEST(nata, test_num_interactions) {
     std::shared_ptr<Simulation> simulation = createNATAContext(0, 0.001, Eigen::Vector3d(0, 0, 0));
     simulation->Init();
 
@@ -510,8 +352,7 @@ TEST(nata, test_num_interactions)
     GTEST_ASSERT_EQ(numInteractionsExp, numInteractionsAct);
 }
 
-TEST(auta, test_num_interactions)
-{
+TEST(auta, test_num_interactions) {
     std::shared_ptr<Simulation> simulation = createAUTAContext(0, 0.001, Eigen::Vector3d(0, 0, 0));
     simulation->Init();
 
@@ -530,8 +371,7 @@ TEST(auta, test_num_interactions)
     GTEST_ASSERT_EQ(numInteractionsExp, numInteractionsAct);
 }
 
-TEST(nata, test_num_particle_interactions)
-{
+TEST(nata, test_num_particle_interactions) {
     std::shared_ptr<Simulation> simulation = createNATAContext(0, 0.001, Eigen::Vector3d(0, 0, 0));
     simulation->Init();
 
@@ -550,8 +390,7 @@ TEST(nata, test_num_particle_interactions)
     GTEST_ASSERT_EQ(numInteractionsTotalExp, numInteractionsTotalAct);
 }
 
-TEST(auta, test_num_particle_interactions)
-{
+TEST(auta, test_num_particle_interactions) {
     std::shared_ptr<Simulation> simulation = createAUTAContext(0, 0.001, Eigen::Vector3d(0, 0, 0));
     simulation->Init();
 
@@ -570,8 +409,7 @@ TEST(auta, test_num_particle_interactions)
     GTEST_ASSERT_EQ(numInteractionsTotalExp, numInteractionsTotalAct);
 }
 
-TEST(nata, test_processed_triplets)
-{
+TEST(nata, test_processed_triplets) {
     MPI_Datatype tripletType = Utility::Triplet::GetMPIType();
     MPI_Type_commit(&tripletType);
 
@@ -631,8 +469,7 @@ TEST(nata, test_processed_triplets)
     GTEST_ASSERT_TRUE(result);
 }
 
-TEST(auta, test_processed_triplets)
-{
+TEST(auta, test_processed_triplets) {
     MPI_Datatype tripletType = Utility::Triplet::GetMPIType();
     MPI_Type_commit(&tripletType);
 
@@ -692,8 +529,7 @@ TEST(auta, test_processed_triplets)
     GTEST_ASSERT_TRUE(result);
 }
 
-TEST(p3bca, test_processed_triplets)
-{
+TEST(p3bca, test_processed_triplets) {
     int worldSize;
     MPI_Comm_size(MPI_COMM_WORLD, &worldSize);
 
@@ -827,8 +663,7 @@ TEST(p3bca, test_processed_triplets)
     GTEST_ASSERT_TRUE(correctNumberOfInteractions);
 }
 
-TEST(utility, test_triplet_uniqueness)
-{
+TEST(utility, test_triplet_uniqueness) {
     Utility::Triplet t0(1, 2, 3);
     Utility::Triplet t1(1, 3, 2);
     Utility::Triplet t2(2, 1, 3);
@@ -866,11 +701,10 @@ TEST(utility, test_triplet_uniqueness)
     GTEST_ASSERT_NE(t5, t6);
 }
 
-TEST(utility, test_particle_constructor)
-{
+TEST(utility, test_particle_constructor) {
     Utility::Particle p0;
     Utility::Particle p1(true);
-    Utility::Particle p2(0, 1., 1., 1., 2., 2., 2., 3., 3., 3., 4.);
+    Utility::Particle p2(0, 1., 1., 1., 2., 2., 2., 4.);
 
     EXPECT_DOUBLE_EQ(p0.pX, 0.);
     EXPECT_DOUBLE_EQ(p0.pY, 0.);
@@ -878,9 +712,6 @@ TEST(utility, test_particle_constructor)
     EXPECT_DOUBLE_EQ(p0.vX, 0.);
     EXPECT_DOUBLE_EQ(p0.vY, 0.);
     EXPECT_DOUBLE_EQ(p0.vZ, 0.);
-    EXPECT_DOUBLE_EQ(p0.aX, 0.);
-    EXPECT_DOUBLE_EQ(p0.aY, 0.);
-    EXPECT_DOUBLE_EQ(p0.aZ, 0.);
     EXPECT_DOUBLE_EQ(p0.mass, 0.);
     EXPECT_FALSE(p0.isDummy);
 
@@ -892,34 +723,19 @@ TEST(utility, test_particle_constructor)
     EXPECT_DOUBLE_EQ(p2.vX, 2.);
     EXPECT_DOUBLE_EQ(p2.vY, 2.);
     EXPECT_DOUBLE_EQ(p2.vZ, 2.);
-    EXPECT_DOUBLE_EQ(p2.aX, 3.);
-    EXPECT_DOUBLE_EQ(p2.aY, 3.);
-    EXPECT_DOUBLE_EQ(p2.aZ, 3.);
     EXPECT_DOUBLE_EQ(p2.mass, 4.);
     EXPECT_FALSE(p2.isDummy);
 }
 
-TEST(utility, test_particle_reset)
-{
-    Utility::Particle p;
-    p.f1X = p.f1Y = p.f1Z = 0.1;
-    p.ResetForce();
-    EXPECT_DOUBLE_EQ(p.f1X, 0.);
-    EXPECT_DOUBLE_EQ(p.f1Y, 0.);
-    EXPECT_DOUBLE_EQ(p.f1Z, 0.);
-}
-
-TEST(utility, test_particle_GetR)
-{
-    Utility::Particle p(0, 1., 2., 3., 0., 0., 0., 0., 0., 0., 0.);
+TEST(utility, test_particle_GetR) {
+    Utility::Particle p(0, 1., 2., 3., 0., 0., 0., 0.);
     Eigen::Vector3d r = p.GetR();
     EXPECT_DOUBLE_EQ(r.x(), 1.);
     EXPECT_DOUBLE_EQ(r.y(), 2.);
     EXPECT_DOUBLE_EQ(r.z(), 3.);
 }
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char* argv[]) {
     int result;
     int numParticles;
 

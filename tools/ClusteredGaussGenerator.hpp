@@ -7,6 +7,7 @@ private:
     const std::array<double, 3> &distributionMean;
     const std::array<double, 3> &distributionStdDev;
     int numClusters;
+
 public:
     ClusteredGaussGenerator(int numParticles, const std::array<double, 3> &velocity,
                             const std::array<double, 3> &boxLength, const std::array<double, 3> &bottomLeftCorner,

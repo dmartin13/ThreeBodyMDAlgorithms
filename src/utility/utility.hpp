@@ -5,8 +5,7 @@
 #include "../external/rapidcsv/src/rapidcsv.h"
 #include "structs.hpp"
 
-namespace Utility
-{
+namespace Utility {
     // https://stackoverflow.com/a/4609795
     template <typename T>
     static int sgn(T val);
@@ -15,7 +14,7 @@ namespace Utility
 
     void getParticlesFromCSV(std::string file, std::vector<Particle> &particles);
     void getParticlesFromTuple(
-        std::vector<std::tuple<int, double, double, double, double, double, double, double, double, double, double>> &tuples,
+        std::vector<std::tuple<int, double, double, double, double, double, double, double>> &tuples,
         std::vector<Particle> &particles);
 
     void writeStepToCSV(std::string file, std::vector<Particle> &particles);

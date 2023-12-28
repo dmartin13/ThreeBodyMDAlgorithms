@@ -4,8 +4,7 @@ NATA::NATA() {}
 
 NATA::~NATA() {}
 
-void NATA::Init(std::shared_ptr<Simulation> simulation)
-{
+void NATA::Init(std::shared_ptr<Simulation> simulation) {
     Algorithm::Init(simulation);
 
     this->b0 = this->simulation->GetDecomposition()->GetMyParticles();
@@ -16,16 +15,14 @@ void NATA::Init(std::shared_ptr<Simulation> simulation)
     this->worldSize = ringTopology->GetWorldSize();
 }
 
-bool NATA::containsProcessed(Utility::Triplet t)
-{
+bool NATA::containsProcessed(Utility::Triplet t) {
     if (std::find(alreadyProcessed.begin(), alreadyProcessed.end(), t) != alreadyProcessed.end()) {
         return true;
     }
     return false;
 }
 
-void NATA::calculateProcessed(int step, bool &calculate)
-{
+void NATA::calculateProcessed(int step, bool &calculate) {
 #ifdef PROFILE_3BMDA
     std::chrono::time_point<std::chrono::system_clock> start;
     std::chrono::time_point<std::chrono::system_clock> end;
@@ -54,8 +51,7 @@ void NATA::calculateProcessed(int step, bool &calculate)
 #endif
 }
 
-int NATA::shiftRight(std::vector<Utility::Particle> &buf)
-{
+int NATA::shiftRight(std::vector<Utility::Particle> &buf) {
 #ifdef PROFILE_3BMDA
     std::chrono::time_point<std::chrono::system_clock> start;
     std::chrono::time_point<std::chrono::system_clock> end;
@@ -79,11 +75,7 @@ int NATA::shiftRight(std::vector<Utility::Particle> &buf)
     return 0;
 }
 
-std::tuple<uint64_t, uint64_t> NATA::SimulationStep()
-{
-    // reset all forces in b0 to 0
-    this->simulation->GetDecomposition()->ResetForces();
-
+std::tuple<uint64_t, uint64_t> NATA::SimulationStep() {
     this->b0 = this->simulation->GetDecomposition()->GetMyParticles();
 
     this->numShifts = 0;
@@ -145,7 +137,7 @@ std::tuple<uint64_t, uint64_t> NATA::SimulationStep()
             }
 
             if (this->worldSize > 1) {
-                #ifdef PROFILE_3BMDA
+#ifdef PROFILE_3BMDA
                 // this prevents double time measurements
                 std::chrono::time_point<std::chrono::system_clock> start;
                 std::chrono::time_point<std::chrono::system_clock> end;
@@ -160,13 +152,13 @@ std::tuple<uint64_t, uint64_t> NATA::SimulationStep()
                     this->times["idle"] = std::make_pair(0, std::vector<int64_t>());
                 }
                 this->times["idle"].second.push_back(elapsed_time.count());
-                #endif
+#endif
                 shiftRight(b2);
                 ++step;
             }
         }
         if (this->worldSize > 1) {
-            #ifdef PROFILE_3BMDA
+#ifdef PROFILE_3BMDA
             // this prevents double time measurements
             std::chrono::time_point<std::chrono::system_clock> start;
             std::chrono::time_point<std::chrono::system_clock> end;
@@ -181,7 +173,7 @@ std::tuple<uint64_t, uint64_t> NATA::SimulationStep()
                 this->times["idle"] = std::make_pair(0, std::vector<int64_t>());
             }
             this->times["idle"].second.push_back(elapsed_time.count());
-            #endif
+#endif
             shiftRight(b1);
         }
     }
@@ -197,4 +189,8 @@ std::tuple<uint64_t, uint64_t> NATA::SimulationStep()
     this->simulation->GetDecomposition()->SetMyParticles(this->b0);
 
     return std::tuple(numBufferInteractions, numParticleInteractionsAcc);
+}
+
+std::tuple<uint64_t, uint64_t> NATA::SimulationStep([[maybe_unused]] ForceType forceType) {
+    throw std::runtime_error("not implemented");
 }

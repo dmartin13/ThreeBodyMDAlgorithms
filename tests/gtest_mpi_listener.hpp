@@ -58,8 +58,7 @@
 #include "gtest/gtest.h"
 #include "mpi.h"
 
-namespace GTestMPIListener
-{
+namespace GTestMPIListener {
     // This class sets up the global test environment, which is needed
     // to finalize MPI.
     class MPIEnvironment : public ::testing::Environment {
@@ -67,13 +66,11 @@ namespace GTestMPIListener
         MPIEnvironment() : ::testing::Environment() {}
         MPIEnvironment(MPI_Comm parent) : ::testing::Environment(), parent(parent) {}
         MPIEnvironment(MPI_Comm parent, std::vector<MPI_Datatype> types)
-            : ::testing::Environment(), parent(parent), types(types)
-        {}
+            : ::testing::Environment(), parent(parent), types(types) {}
 
         virtual ~MPIEnvironment() {}
 
-        virtual void SetUp()
-        {
+        virtual void SetUp() {
             int is_mpi_initialized;
             ASSERT_EQ(MPI_Initialized(&is_mpi_initialized), MPI_SUCCESS);
             if (!is_mpi_initialized) {
@@ -84,8 +81,7 @@ namespace GTestMPIListener
             }
         }
 
-        virtual void TearDown()
-        {
+        virtual void TearDown() {
             if (this->parent != MPI_COMM_NULL) {
                 ASSERT_EQ(MPI_Barrier(this->parent), MPI_SUCCESS);
             }
@@ -122,8 +118,7 @@ namespace GTestMPIListener
     // gathering all results onto rank zero.
     class MPIMinimalistPrinter : public ::testing::EmptyTestEventListener {
     public:
-        MPIMinimalistPrinter() : ::testing::EmptyTestEventListener(), result_vector()
-        {
+        MPIMinimalistPrinter() : ::testing::EmptyTestEventListener(), result_vector() {
             int is_mpi_initialized;
             assert(MPI_Initialized(&is_mpi_initialized) == MPI_SUCCESS);
             if (!is_mpi_initialized) {
@@ -136,8 +131,7 @@ namespace GTestMPIListener
             UpdateCommState();
         }
 
-        MPIMinimalistPrinter(MPI_Comm comm_) : ::testing::EmptyTestEventListener(), result_vector()
-        {
+        MPIMinimalistPrinter(MPI_Comm comm_) : ::testing::EmptyTestEventListener(), result_vector() {
             int is_mpi_initialized;
             assert(MPI_Initialized(&is_mpi_initialized) == MPI_SUCCESS);
             if (!is_mpi_initialized) {
@@ -151,8 +145,7 @@ namespace GTestMPIListener
             UpdateCommState();
         }
 
-        MPIMinimalistPrinter(const MPIMinimalistPrinter &printer)
-        {
+        MPIMinimalistPrinter(const MPIMinimalistPrinter &printer) {
             int is_mpi_initialized;
             assert(MPI_Initialized(&is_mpi_initialized) == MPI_SUCCESS);
             if (!is_mpi_initialized) {
@@ -168,8 +161,7 @@ namespace GTestMPIListener
         }
 
         // Called before the Environment is torn down.
-        void OnEnvironmentTearDownStart()
-        {
+        void OnEnvironmentTearDownStart() {
             int is_mpi_finalized;
             assert(MPI_Finalized(&is_mpi_finalized) == MPI_SUCCESS);
             if (!is_mpi_finalized) {
@@ -178,8 +170,7 @@ namespace GTestMPIListener
         }
 
         // Called before a test starts.
-        virtual void OnTestStart(const ::testing::TestInfo &test_info)
-        {
+        virtual void OnTestStart(const ::testing::TestInfo &test_info) {
             // Only need to report test start info on rank 0
             if (rank == 0) {
                 printf("*** Test %s.%s starting.\n", test_info.test_case_name(), test_info.name());
@@ -190,14 +181,12 @@ namespace GTestMPIListener
         // In an MPI program, this means that certain ranks may not call this
         // function if a test part does not fail on all ranks. Consequently, it
         // is difficult to have explicit synchronization points here.
-        virtual void OnTestPartResult(const ::testing::TestPartResult &test_part_result)
-        {
+        virtual void OnTestPartResult(const ::testing::TestPartResult &test_part_result) {
             result_vector.push_back(test_part_result);
         }
 
         // Called after a test ends.
-        virtual void OnTestEnd(const ::testing::TestInfo &test_info)
-        {
+        virtual void OnTestEnd(const ::testing::TestInfo &test_info) {
             int localResultCount = result_vector.size();
             std::vector<int> resultCountOnRank(size, 0);
             MPI_Gather(&localResultCount, 1, MPI_INT, &resultCountOnRank[0], 1, MPI_INT, 0, comm);
@@ -264,8 +253,7 @@ namespace GTestMPIListener
         int size;
         std::vector<::testing::TestPartResult> result_vector;
 
-        int UpdateCommState()
-        {
+        int UpdateCommState() {
             int flag = MPI_Comm_rank(comm, &rank);
             if (flag != MPI_SUCCESS) {
                 return flag;
@@ -282,8 +270,7 @@ namespace GTestMPIListener
     class MPIWrapperPrinter : public ::testing::TestEventListener {
     public:
         MPIWrapperPrinter(::testing::TestEventListener *l, MPI_Comm comm_)
-            : ::testing::TestEventListener(), listener(l), result_vector()
-        {
+            : ::testing::TestEventListener(), listener(l), result_vector() {
             int is_mpi_initialized = 1;
             assert(MPI_Initialized(&is_mpi_initialized) == MPI_SUCCESS);
             if (!is_mpi_initialized) {
@@ -298,8 +285,7 @@ namespace GTestMPIListener
         }
 
         MPIWrapperPrinter(const MPIWrapperPrinter &printer)
-            : listener(printer.listener), result_vector(printer.result_vector)
-        {
+            : listener(printer.listener), result_vector(printer.result_vector) {
             int is_mpi_initialized;
             assert(MPI_Initialized(&is_mpi_initialized) == MPI_SUCCESS);
             if (!is_mpi_initialized) {
@@ -314,8 +300,7 @@ namespace GTestMPIListener
         }
 
         // Called before test activity starts
-        virtual void OnTestProgramStart(const ::testing::UnitTest &unit_test)
-        {
+        virtual void OnTestProgramStart(const ::testing::UnitTest &unit_test) {
             if (rank == 0) {
                 listener->OnTestProgramStart(unit_test);
             }
@@ -324,31 +309,27 @@ namespace GTestMPIListener
         // Called before each test iteration starts, where iteration is
         // the iterate index. There could be more than one iteration if
         // GTEST_FLAG(repeat) is used.
-        virtual void OnTestIterationStart(const ::testing::UnitTest &unit_test, int iteration)
-        {
+        virtual void OnTestIterationStart(const ::testing::UnitTest &unit_test, int iteration) {
             if (rank == 0) {
                 listener->OnTestIterationStart(unit_test, iteration);
             }
         }
 
         // Called before environment setup before start of each test iteration
-        virtual void OnEnvironmentsSetUpStart(const ::testing::UnitTest &unit_test)
-        {
+        virtual void OnEnvironmentsSetUpStart(const ::testing::UnitTest &unit_test) {
             if (rank == 0) {
                 listener->OnEnvironmentsSetUpStart(unit_test);
             }
         }
 
-        virtual void OnEnvironmentsSetUpEnd(const ::testing::UnitTest &unit_test)
-        {
+        virtual void OnEnvironmentsSetUpEnd(const ::testing::UnitTest &unit_test) {
             if (rank == 0) {
                 listener->OnEnvironmentsSetUpEnd(unit_test);
             }
         }
 
 #ifndef GTEST_REMOVE_LEGACY_TEST_CASEAPI_
-        virtual void OnTestCaseStart(const ::testing::TestCase &test_case)
-        {
+        virtual void OnTestCaseStart(const ::testing::TestCase &test_case) {
             if (rank == 0) {
                 listener->OnTestCaseStart(test_case);
             }
@@ -356,8 +337,7 @@ namespace GTestMPIListener
 #endif  // GTEST_REMOVE_LEGACY_TEST_CASEAPI_
 
         // Called before a test starts.
-        virtual void OnTestStart(const ::testing::TestInfo &test_info)
-        {
+        virtual void OnTestStart(const ::testing::TestInfo &test_info) {
             // Only need to report test start info on rank 0
             if (rank == 0) {
                 listener->OnTestStart(test_info);
@@ -368,8 +348,7 @@ namespace GTestMPIListener
         // In an MPI program, this means that certain ranks may not call this
         // function if a test part does not fail on all ranks. Consequently, it
         // is difficult to have explicit synchronization points here.
-        virtual void OnTestPartResult(const ::testing::TestPartResult &test_part_result)
-        {
+        virtual void OnTestPartResult(const ::testing::TestPartResult &test_part_result) {
             result_vector.push_back(test_part_result);
             if (rank == 0) {
                 listener->OnTestPartResult(test_part_result);
@@ -377,8 +356,7 @@ namespace GTestMPIListener
         }
 
         // Called after a test ends.
-        virtual void OnTestEnd(const ::testing::TestInfo &test_info)
-        {
+        virtual void OnTestEnd(const ::testing::TestInfo &test_info) {
             int localResultCount = result_vector.size();
             std::vector<int> resultCountOnRank(size, 0);
             MPI_Gather(&localResultCount, 1, MPI_INT, &resultCountOnRank[0], 1, MPI_INT, 0, comm);
@@ -462,8 +440,7 @@ namespace GTestMPIListener
         }
 
 #ifndef GTEST_REMOVE_LEGACY_TEST_CASEAPI_
-        virtual void OnTestCaseEnd(const ::testing::TestCase &test_case)
-        {
+        virtual void OnTestCaseEnd(const ::testing::TestCase &test_case) {
             if (rank == 0) {
                 listener->OnTestCaseEnd(test_case);
             }
@@ -472,8 +449,7 @@ namespace GTestMPIListener
 #endif
 
         // Called before the Environment is torn down.
-        virtual void OnEnvironmentsTearDownStart(const ::testing::UnitTest &unit_test)
-        {
+        virtual void OnEnvironmentsTearDownStart(const ::testing::UnitTest &unit_test) {
             int is_mpi_finalized = 1;
             assert(MPI_Finalized(&is_mpi_finalized) == MPI_SUCCESS);
             if (!is_mpi_finalized) {
@@ -484,23 +460,20 @@ namespace GTestMPIListener
             }
         }
 
-        virtual void OnEnvironmentsTearDownEnd(const ::testing::UnitTest &unit_test)
-        {
+        virtual void OnEnvironmentsTearDownEnd(const ::testing::UnitTest &unit_test) {
             if (rank == 0) {
                 listener->OnEnvironmentsTearDownEnd(unit_test);
             }
         }
 
-        virtual void OnTestIterationEnd(const ::testing::UnitTest &unit_test, int iteration)
-        {
+        virtual void OnTestIterationEnd(const ::testing::UnitTest &unit_test, int iteration) {
             if (rank == 0) {
                 listener->OnTestIterationEnd(unit_test, iteration);
             }
         }
 
         // Called when test driver program ends
-        virtual void OnTestProgramEnd(const ::testing::UnitTest &unit_test)
-        {
+        virtual void OnTestProgramEnd(const ::testing::UnitTest &unit_test) {
             if (rank == 0) {
                 listener->OnTestProgramEnd(unit_test);
             }
@@ -516,8 +489,7 @@ namespace GTestMPIListener
         int size;
         std::vector<::testing::TestPartResult> result_vector;
 
-        int UpdateCommState()
-        {
+        int UpdateCommState() {
             int flag = MPI_Comm_rank(comm, &rank);
             if (flag != MPI_SUCCESS) {
                 return flag;

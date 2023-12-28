@@ -4,8 +4,7 @@ Algorithm::Algorithm() {}
 
 Algorithm::~Algorithm() {}
 
-void Algorithm::Init(std::shared_ptr<Simulation> simulation)
-{
+void Algorithm::Init(std::shared_ptr<Simulation> simulation) {
     this->simulation = simulation;
     this->mpiParticleType = simulation->GetMPIParticleType();
     this->potential = this->simulation->GetTriwisePotential();
@@ -27,16 +26,14 @@ void Algorithm::Init(std::shared_ptr<Simulation> simulation)
 std::tuple<uint64_t, uint64_t> Algorithm::CalculateInteractions(std::vector<Utility::Particle> &b0,
                                                                 std::vector<Utility::Particle> &b1,
                                                                 std::vector<Utility::Particle> &b2, int b0Owner,
-                                                                int b1Owner, int b2Owner)
-{
+                                                                int b1Owner, int b2Owner) {
     return calculateInteractions(b0, b1, b2, b0Owner, b1Owner, b2Owner, 0, -1, -1, Eigen::Array3d(-1));
 }
 
 std::tuple<uint64_t, uint64_t> Algorithm::CalculateInteractions(std::vector<Utility::Particle> &b0,
                                                                 std::vector<Utility::Particle> &b1,
                                                                 std::vector<Utility::Particle> &b2, int b0Owner,
-                                                                int b1Owner, int b2Owner, int b0Start, int b0NumSteps)
-{
+                                                                int b1Owner, int b2Owner, int b0Start, int b0NumSteps) {
     return calculateInteractions(b0, b1, b2, b0Owner, b1Owner, b2Owner, b0Start, b0NumSteps, -1, Eigen::Array3d(-1));
 }
 
@@ -44,8 +41,7 @@ std::tuple<uint64_t, uint64_t> Algorithm::CalculateInteractions(std::vector<Util
                                                                 std::vector<Utility::Particle> &b1,
                                                                 std::vector<Utility::Particle> &b2, int b0Owner,
                                                                 int b1Owner, int b2Owner, double cutoff,
-                                                                Eigen::Array3d physicalDomainSize)
-{
+                                                                Eigen::Array3d physicalDomainSize) {
     return calculateInteractions(b0, b1, b2, b0Owner, b1Owner, b2Owner, 0, -1, cutoff, physicalDomainSize);
 }
 
@@ -53,8 +49,7 @@ std::tuple<uint64_t, uint64_t> Algorithm::calculateInteractions(std::vector<Util
                                                                 std::vector<Utility::Particle> &b1,
                                                                 std::vector<Utility::Particle> &b2, int b0Owner,
                                                                 int b1Owner, int b2Owner, int b0Start, int b0NumSteps,
-                                                                double cutoff, Eigen::Array3d physicalDomainSize)
-{
+                                                                double cutoff, Eigen::Array3d physicalDomainSize) {
 #ifdef PROFILE_3BMDA
     this->calcForcesAcc = 0;
     // bool append = false;
@@ -71,7 +66,8 @@ std::tuple<uint64_t, uint64_t> Algorithm::calculateInteractions(std::vector<Util
     //    #pragma omp single
     //    {
     for (size_t i = b0Start; i < (b0NumSteps != -1 ? (size_t)(b0Start + b0NumSteps) : b0.size()); ++i) {
-        if (b0NumSteps != -1) std::cout << worldRank << ": " << i << std::endl;
+        if (b0NumSteps != -1)
+            std::cout << worldRank << ": " << i << std::endl;
         if (b0[i].isDummy) {
             continue;
         }
@@ -236,8 +232,7 @@ void Algorithm::calcParticleInteractions(std::vector<std::tuple<int, int, int>> 
 
 // void __attribute__((optimize("O0"))) P3BCA::sumUpParticles()
 void Algorithm::SumUpParticles(std::vector<Utility::Particle> &b0, std::vector<Utility::Particle> &b1,
-                               std::vector<Utility::Particle> &b2)
-{
+                               std::vector<Utility::Particle> &b2) {
 #ifdef PROFILE_3BMDA
     std::chrono::time_point<std::chrono::system_clock> start;
     std::chrono::time_point<std::chrono::system_clock> end;
@@ -263,8 +258,7 @@ void Algorithm::SumUpParticles(std::vector<Utility::Particle> &b0, std::vector<U
 #endif
 }
 
-void Algorithm::SumUpParticles(std::vector<Utility::Particle> &b0, std::vector<Utility::Particle> &b1)
-{
+void Algorithm::SumUpParticles(std::vector<Utility::Particle> &b0, std::vector<Utility::Particle> &b1) {
 #ifdef PROFILE_3BMDA
     std::chrono::time_point<std::chrono::system_clock> start;
     std::chrono::time_point<std::chrono::system_clock> end;
@@ -292,20 +286,16 @@ void Algorithm::SumUpParticles(std::vector<Utility::Particle> &b0, std::vector<U
 
 std::tuple<uint64_t, uint64_t> Algorithm::CalculatePairwiseInteractions(std::vector<Utility::Particle> &b0,
                                                                         std::vector<Utility::Particle> &b1, int b0Owner,
-                                                                        int b1Owner)
-{
+                                                                        int b1Owner) {
     return calculatePairwiseInteractions(b0, b1, b0Owner, b1Owner, 0, -1, -1, Eigen::Array3d(-1));
 }
 
-std::tuple<uint64_t, uint64_t> Algorithm::calculatePairwiseInteractions(std::vector<Utility::Particle> &b0,
-                                                                        std::vector<Utility::Particle> &b1, int b0Owner,
-                                                                        int b1Owner, int b0Start, int b0NumSteps,
-                                                                        double cutoff,
-                                                                        Eigen::Array3d physicalDomainSize)
-{
+std::tuple<uint64_t, uint64_t> Algorithm::calculatePairwiseInteractions(
+    std::vector<Utility::Particle> &b0, std::vector<Utility::Particle> &b1, int b0Owner, int b1Owner, int b0Start,
+    int b0NumSteps, [[maybe_unused]] double cutoff, [[maybe_unused]] Eigen::Array3d physicalDomainSize) {
     uint64_t numActParticleInteractions = 0;
     uint64_t numPossibleParticleInteractions = 0;
-    double sqrCutoff = cutoff * cutoff;
+    // double sqrCutoff = cutoff * cutoff;
     for (size_t i = b0Start; i < (b0NumSteps != -1 ? (size_t)(b0Start + b0NumSteps) : b0.size()); ++i) {
         if (b0[i].isDummy) {
             continue;

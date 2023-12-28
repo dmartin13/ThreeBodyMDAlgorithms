@@ -8,11 +8,9 @@ Simulation::Simulation(int iterations, std::shared_ptr<Algorithm> algorithm, std
                        std::string csvOutput)
     : iterations(iterations), algorithm(algorithm), topology(topology), pairwisepotential(pairwisepotential),
       triwisepotential(triwisepotential), decomposition(decomposition), mpiParticleType(mpiParticleType),
-      particles(particles), dt(dt), gForce(gForce), csvOutput(csvOutput)
-{}
+      particles(particles), dt(dt), gForce(gForce), csvOutput(csvOutput) {}
 
-void Simulation::Init()
-{
+void Simulation::Init() {
     std::shared_ptr<Simulation> simulationPtr = shared_from_this();
     this->topology->Init(simulationPtr);
     this->decomposition->Init(simulationPtr);
@@ -30,26 +28,55 @@ std::shared_ptr<PairwisePotential> Simulation::GetPairwisePotential() { return t
 std::shared_ptr<TriwisePotential> Simulation::GetTriwisePotential() { return this->triwisepotential; }
 std::shared_ptr<DomainDecomposition> Simulation::GetDecomposition() { return this->decomposition; }
 
-void Simulation::Start()
-{
+void Simulation::Start() {
+    // TODO: get this from config
+    const bool respaActive = true;
+
     for (int i = 0; i < iterations; ++i) {
 #ifdef MEASURESIMSTEP_3BMDA
         std::chrono::time_point<std::chrono::system_clock> start;
         std::chrono::time_point<std::chrono::system_clock> end;
         start = std::chrono::system_clock::now();
 #endif
+        // determine if this iteration is a respa step
+        const bool isRespaIteration = respaActive and (i % respaStepSize == 0);
+        const bool nextIsRespaIteration = respaActive and ((i + 1) % respaStepSize == 0);
 
-        // update particle positions at predictor stage
-        this->decomposition->UpdatePredictorStage(this->dt);
-        MPI_Barrier(this->topology->GetComm());
+        // determine the forceType to calculate in this iteration
+        auto forceTypeToCalculate = ForceType::TwoAndThreeBody;
+        if (respaActive and (not nextIsRespaIteration)) {
+            // if respa should be used but this is not a respa iteration then only calculate two body interactions
+            forceTypeToCalculate = ForceType::TwoBody;
+        }
 
-        // execute algorithm... force calculation
-        numInteractions.push_back(this->algorithm->SimulationStep());
-        MPI_Barrier(this->topology->GetComm());
+        if (respaActive and isRespaIteration) {
+            // update velocities with three body force
+            decomposition->UpdateVelocities(dt, ForceType::ThreeBody, respaStepSize);
+        }
 
-        // update the particle positions
-        this->decomposition->Update(this->dt, this->gForce);
-        MPI_Barrier(this->topology->GetComm());
+        // the following part is the inner loop of the respa algorithm
+        {
+            // update particle positions using the two-body force
+            decomposition->UpdatePositions(dt, gForce, respaActive ? ForceType::TwoBody : ForceType::TwoAndThreeBody);
+            MPI_Barrier(this->topology->GetComm());
+
+            // execute algorithm... force calculation
+            // numInteractions.push_back(this->algorithm->SimulationStep());
+            numInteractions.push_back(this->algorithm->SimulationStep(forceTypeToCalculate));
+            MPI_Barrier(this->topology->GetComm());
+
+            // update the velocities
+            decomposition->UpdateVelocities(dt, respaActive ? ForceType::TwoBody : ForceType::TwoAndThreeBody,
+                                            respaStepSize);
+            MPI_Barrier(this->topology->GetComm());
+        }
+
+        // check if the next iteration is a respa iteration
+        if (respaActive and nextIsRespaIteration) {
+            // 3-body force has already bee calculated in inner loop
+            // update velocities using three body force
+            decomposition->UpdateVelocities(dt, ForceType::ThreeBody, respaStepSize);
+        }
 
 #ifdef MEASURESIMSTEP_3BMDA
         end = std::chrono::system_clock::now();
@@ -90,18 +117,15 @@ std::vector<Utility::Particle>& Simulation::GetAllParticles() { return this->par
 
 double Simulation::GetDeltaT() { return this->dt; }
 int Simulation::GetNumIterations() { return this->iterations; }
-uint64_t Simulation::GetNumBufferInteractions(int step)
-{
+uint64_t Simulation::GetNumBufferInteractions(int step) {
     return (size_t)step < this->numInteractions.size() ? std::get<0>(this->numInteractions[step]) : 0;
 }
-uint64_t Simulation::GetNumParticleInteractions(int step)
-{
+uint64_t Simulation::GetNumParticleInteractions(int step) {
     return (size_t)step < this->numInteractions.size() ? std::get<1>(this->numInteractions[step]) : 0;
 }
 Eigen::Vector3d Simulation::GetGForce() { return this->gForce; }
 
-void Simulation::writeSimulationStepToCSV(std::string file)
-{
+void Simulation::writeSimulationStepToCSV(std::string file) {
     std::vector<Utility::Particle> receivedParticlesForCSVOutput;
 
     int numProcessors = topology->GetWorldSize();

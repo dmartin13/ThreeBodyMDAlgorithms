@@ -2,9 +2,9 @@
 
 #include <memory>
 
+#include "Potential.hpp"
 #include "fwd.hpp"
 #include "utility/utility.hpp"
-#include "Potential.hpp"
 
 class PairwisePotential : public Potential {
 protected:

@@ -9,6 +9,7 @@ class Topology;
 class NATA;
 class P3BCA;
 class AUTA;
+class EAUTA;
 
 // decompositions
 class AtomDecomposition;

@@ -4,8 +4,7 @@ AUTA::AUTA() {}
 
 AUTA::~AUTA() {}
 
-void AUTA::Init(std::shared_ptr<Simulation> simulation)
-{
+void AUTA::Init(std::shared_ptr<Simulation> simulation) {
     Algorithm::Init(simulation);
 
     // in this algorithm we copy b0, as this buffer is also shifted around
@@ -21,8 +20,7 @@ void AUTA::Init(std::shared_ptr<Simulation> simulation)
     this->b2Owner = this->worldRank;
 }
 
-int AUTA::shiftRight(std::vector<Utility::Particle>& buf, int owner)
-{
+int AUTA::shiftRight(std::vector<Utility::Particle>& buf, int owner) {
 #ifdef PROFILE_3BMDA
     std::chrono::time_point<std::chrono::system_clock> start;
     std::chrono::time_point<std::chrono::system_clock> end;
@@ -50,8 +48,7 @@ int AUTA::shiftRight(std::vector<Utility::Particle>& buf, int owner)
     return status.MPI_TAG;
 }
 
-std::tuple<uint64_t, uint64_t> AUTA::calculateOneThirdOfInteractions(int thirdID)
-{
+std::tuple<uint64_t, uint64_t> AUTA::calculateOneThirdOfInteractions(int thirdID) {
     std::vector<Utility::Particle>* b0Sorted = nullptr;
     std::vector<Utility::Particle>* b1Sorted = nullptr;
     std::vector<Utility::Particle>* b2Sorted = nullptr;
@@ -119,30 +116,41 @@ std::tuple<uint64_t, uint64_t> AUTA::calculateOneThirdOfInteractions(int thirdID
                                        start, numSteps);
 }
 
-std::vector<Utility::Particle>* AUTA::pickBuffer(int i)
-{
+std::vector<Utility::Particle>* AUTA::pickBuffer(int i) {
     switch (i) {
-        case 0: return &this->b0; break;
-        case 1: return &this->b1; break;
-        case 2: return &this->b2; break;
+        case 0:
+            return &this->b0;
+            break;
+        case 1:
+            return &this->b1;
+            break;
+        case 2:
+            return &this->b2;
+            break;
 
-        default: exit(1);
+        default:
+            exit(1);
     }
 }
 
-int& AUTA::getBufOwner(int i)
-{
+int& AUTA::getBufOwner(int i) {
     switch (i) {
-        case 0: return this->b0Owner; break;
-        case 1: return this->b1Owner; break;
-        case 2: return this->b2Owner; break;
+        case 0:
+            return this->b0Owner;
+            break;
+        case 1:
+            return this->b1Owner;
+            break;
+        case 2:
+            return this->b2Owner;
+            break;
 
-        default: exit(1);
+        default:
+            exit(1);
     }
 }
 
-void AUTA::sendBackParticles()
-{
+void AUTA::sendBackParticles() {
 #ifdef PROFILE_3BMDA
     std::chrono::time_point<std::chrono::system_clock> start;
     std::chrono::time_point<std::chrono::system_clock> end;
@@ -233,11 +241,7 @@ void AUTA::sendBackParticles()
 #endif
 }
 
-std::tuple<uint64_t, uint64_t> AUTA::SimulationStep()
-{
-    // reset all forces in b0 to 0
-    this->simulation->GetDecomposition()->ResetForces();
-
+std::tuple<uint64_t, uint64_t> AUTA::SimulationStep() {
     this->b0 = this->simulation->GetDecomposition()->GetMyParticles();
 
     this->numShifts = 0;
@@ -279,7 +283,7 @@ std::tuple<uint64_t, uint64_t> AUTA::SimulationStep()
                 end = std::chrono::system_clock::now();
 #endif
                 getBufOwner(i) = shiftRight(*bi, getBufOwner(i));
-                
+
 #ifdef PROFILE_3BMDA
                 auto elapsed_time = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
                 bool hasKey = this->times.count("idle");
@@ -381,4 +385,8 @@ std::tuple<uint64_t, uint64_t> AUTA::SimulationStep()
     this->simulation->GetDecomposition()->SetMyParticles(this->b0);
 
     return std::tuple(numBufferInteractions, numParticleInteractionsAcc);
+}
+
+std::tuple<uint64_t, uint64_t> AUTA::SimulationStep([[maybe_unused]] ForceType forceType) {
+    throw std::runtime_error("not implemented");
 }

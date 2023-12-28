@@ -2,8 +2,8 @@
 #include <chrono>
 #include <vector>
 
-#include "topology/RingTopology.hpp"
 #include "Algorithm.hpp"
+#include "topology/RingTopology.hpp"
 
 class NATA final : public Algorithm {
 private:
@@ -33,4 +33,5 @@ public:
     void Init(std::shared_ptr<Simulation> simulation) override;
 
     std::tuple<uint64_t, uint64_t> SimulationStep() override;
+    std::tuple<uint64_t, uint64_t> SimulationStep([[maybe_unused]] ForceType forceType) override;
 };

@@ -19,7 +19,7 @@ protected:
     uint_fast32_t seed0;
     uint_fast32_t seed1;
 
-    std::vector<std::tuple<int, double, double, double, double, double, double, double, double, double, double>> particles;
+    std::vector<std::tuple<int, double, double, double, double, double, double, double>> particles;
 
 public:
     ParticleGenerator(int numParticles, const std::array<double, 3> &velocity, const std::array<double, 3> &boxLength,
@@ -30,8 +30,7 @@ public:
 
     virtual void Generate() = 0;
 
-    std::vector<std::tuple<int, double, double, double, double, double, double, double, double, double, double>>
-    GetParticles();
+    std::vector<std::tuple<int, double, double, double, double, double, double, double>> GetParticles();
 
     enum Generator { ClosestPacked, ClusteredGauss, Gauss, Grid, Uniform };
 

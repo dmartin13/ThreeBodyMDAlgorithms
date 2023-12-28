@@ -28,8 +28,8 @@ private:
     int shiftLeft(std::vector<Utility::Particle>& buf, int owner);
     std::tuple<uint64_t, uint64_t> calculateOneThirdOfInteractions(int thirdID);
     std::tuple<uint64_t, uint64_t> calculateOneHalfOfInteractions(std::vector<Utility::Particle>& b0,
-                                                                     std::vector<Utility::Particle>& b1, int b0Owner,
-                                                                     int b1Owner, int halfID);
+                                                                  std::vector<Utility::Particle>& b1, int b0Owner,
+                                                                  int b1Owner, int halfID);
     std::vector<Utility::Particle>* pickBuffer(int i);
     int& getBufOwner(int i);
     void sendBackParticles();
@@ -40,5 +40,5 @@ public:
 
     void Init(std::shared_ptr<Simulation> simulation) override;
 
-    std::tuple<uint64_t, uint64_t> SimulationStep(InteractionType interactionType);
+    std::tuple<uint64_t, uint64_t> SimulationStep(ForceType forceType) override;
 };

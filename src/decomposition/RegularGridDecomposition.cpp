@@ -3,8 +3,7 @@
 RegularGridDecomposition::RegularGridDecomposition() {}
 RegularGridDecomposition::~RegularGridDecomposition() {}
 
-void RegularGridDecomposition::Init(std::shared_ptr<Simulation> simulation)
-{
+void RegularGridDecomposition::Init(std::shared_ptr<Simulation> simulation) {
     DomainDecomposition::Init(simulation);
 
     this->cartTopology = (std::static_pointer_cast<CartTopology>(this->simulation->GetTopology()));
@@ -38,8 +37,7 @@ void RegularGridDecomposition::Init(std::shared_ptr<Simulation> simulation)
     binParticles(this->simulation->GetAllParticles());
 }
 
-void RegularGridDecomposition::binParticles(std::vector<Utility::Particle>& particles)
-{
+void RegularGridDecomposition::binParticles(std::vector<Utility::Particle>& particles) {
     for (size_t i = 0; i < particles.size(); i++) {
         if (isInsideLocalCell(particles[i])) {
             this->myParticles.push_back(particles[i]);
@@ -47,8 +45,7 @@ void RegularGridDecomposition::binParticles(std::vector<Utility::Particle>& part
     }
 }
 
-void RegularGridDecomposition::exchangeParticles()
-{
+void RegularGridDecomposition::exchangeParticles() {
     // avoid that we are trying to send a particle to our self.. so only exchange particle in dimensions where #proc is
     // > 1
     for (int i = 0; i < this->numDims; i++) {
@@ -56,8 +53,7 @@ void RegularGridDecomposition::exchangeParticles()
     }
 }
 
-void RegularGridDecomposition::exchangeParticlesDim(int dim)
-{
+void RegularGridDecomposition::exchangeParticlesDim(int dim) {
     this->sendToLeftNeighbor.clear();
     this->sendToRightNeighbor.clear();
     this->recvFromLeftNeighbor.clear();
@@ -122,8 +118,7 @@ void RegularGridDecomposition::exchangeParticlesDim(int dim)
     }
 }
 
-bool RegularGridDecomposition::isInsideLocalCell(Utility::Particle& particle)
-{
+bool RegularGridDecomposition::isInsideLocalCell(Utility::Particle& particle) {
     if (particle.pX <= this->localCellMin.x() || particle.pY <= this->localCellMin.y() ||
         particle.pZ <= this->localCellMin.z() || particle.pX > this->localCellMax.x() ||
         particle.pY > this->localCellMax.y() || particle.pZ > this->localCellMax.z()) {
@@ -133,8 +128,7 @@ bool RegularGridDecomposition::isInsideLocalCell(Utility::Particle& particle)
 }
 
 std::tuple<Eigen::Array3d, Eigen::Array3d> RegularGridDecomposition::getDomainMinMax(
-    std::vector<Utility::Particle>& particles)
-{
+    std::vector<Utility::Particle>& particles) {
     double minX, minY, minZ;
     double maxX, maxY, maxZ;
     minX = minY = minZ = std::numeric_limits<double>::max();
@@ -164,19 +158,6 @@ std::tuple<Eigen::Array3d, Eigen::Array3d> RegularGridDecomposition::getDomainMi
     return std::tuple<Eigen::Array3d, Eigen::Array3d>(Eigen::Array3d(minX - 0.0001, minY - 0.0001, minZ - 0.0001),
                                                       Eigen::Array3d(maxX + 0.0001, maxY + 0.0001, maxZ + 0.0001));
 }
-
-void RegularGridDecomposition::Update(double dt, Eigen::Vector3d gForce)
-{
-    // update all my particles
-    this->updateMyParticles(dt, gForce);
-
-    // recalculate boundaries.. but only if we have more than one processor
-    if (cartTopology->GetWorldSize() > 1) {
-        exchangeParticles();
-    }
-}
-
-void RegularGridDecomposition::UpdatePredictorStage(double dt) { this->updateMyParticlesPredictorStage(dt); }
 
 Eigen::Array3d RegularGridDecomposition::GetCellSize() { return this->localCellWidth; }
 Eigen::Array3d RegularGridDecomposition::GetPhysicalDomainSize() { return this->physicalDomainSize; }

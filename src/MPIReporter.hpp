@@ -8,14 +8,13 @@
 // https://de.wikibooks.org/wiki/C%2B%2B-Programmierung:_Entwurfsmuster:_Singleton
 class MPIReporter {
 public:
-    static MPIReporter* instance()
-    {
+    static MPIReporter* instance() {
         static CGuard g;  // Speicherbereinigung
-        if (!_instance) _instance = new MPIReporter();
+        if (!_instance)
+            _instance = new MPIReporter();
         return _instance;
     }
-    void StoreMessage(int rank, std::string message)
-    {
+    void StoreMessage(int rank, std::string message) {
         this->messages.push_back("Message from processor: " + std::to_string(rank) + ": " + message);
     };
     std::vector<std::string> GetAllMessages() { return this->messages; };
@@ -30,8 +29,7 @@ Kopie-Konstruktor erstellt werden kann */
     ~MPIReporter() {}
     class CGuard {
     public:
-        ~CGuard()
-        {
+        ~CGuard() {
             if (NULL != MPIReporter::_instance) {
                 delete MPIReporter::_instance;
                 MPIReporter::_instance = NULL;

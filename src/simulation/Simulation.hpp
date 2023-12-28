@@ -13,6 +13,7 @@
 class Simulation : public std::enable_shared_from_this<Simulation> {
 private:
     int iterations;
+    size_t respaStepSize;
     std::shared_ptr<Algorithm> algorithm;
     std::shared_ptr<Topology> topology;
     // std::shared_ptr<Potential> potential;

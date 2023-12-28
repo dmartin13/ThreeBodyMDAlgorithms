@@ -6,8 +6,7 @@ RingTopology::~RingTopology() {}
 int RingTopology::GetLeftNeighbor() { return this->leftNeighbor; }
 int RingTopology::GetRightNeighbor() { return this->rightNeighbor; }
 
-void RingTopology::Init(std::shared_ptr<Simulation> simulation)
-{
+void RingTopology::Init(std::shared_ptr<Simulation> simulation) {
     Topology::Init(simulation);
 
     MPI_Comm_size(MPI_COMM_WORLD, &this->worldSize);

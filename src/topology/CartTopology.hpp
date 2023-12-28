@@ -36,6 +36,5 @@ public:
 
     void Init(std::shared_ptr<Simulation> simulation) override;
 
-
     std::array<int, 3> GetDims();
 };

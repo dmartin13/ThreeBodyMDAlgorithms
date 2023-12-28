@@ -30,8 +30,7 @@ Utility::cliArguments a;
 std::vector<Utility::Particle> particles;
 MPI_Datatype mpiParticleType;
 
-std::shared_ptr<Simulation> createNATAContext(std::string csvOut)
-{
+std::shared_ptr<Simulation> createNATAContext(std::string csvOut) {
     // create topology
     std::shared_ptr<RingTopology> ringTopology = std::make_shared<RingTopology>();
 
@@ -56,8 +55,7 @@ std::shared_ptr<Simulation> createNATAContext(std::string csvOut)
     return simulation;
 }
 
-std::shared_ptr<Simulation> createP3BCAContext(std::string csvOut, std::vector<int> decomposition)
-{
+std::shared_ptr<Simulation> createP3BCAContext(std::string csvOut, std::vector<int> decomposition) {
     // create topology
     std::shared_ptr<CartTopology> cartTopology = std::make_shared<CartTopology>(decomposition);
 
@@ -82,8 +80,7 @@ std::shared_ptr<Simulation> createP3BCAContext(std::string csvOut, std::vector<i
     return simulation;
 }
 
-std::shared_ptr<Simulation> createAUTAContext(std::string csvOut)
-{
+std::shared_ptr<Simulation> createAUTAContext(std::string csvOut) {
     // create topology
     std::shared_ptr<RingTopology> ringTopology = std::make_shared<RingTopology>();
 
@@ -110,8 +107,7 @@ std::shared_ptr<Simulation> createAUTAContext(std::string csvOut)
 
 #ifdef PROFILE_3BMDA
 
-std::string charToTimeUnit(const char& c)
-{
+std::string charToTimeUnit(const char& c) {
     if (c == 0) {
         return std::string("nanosecond");
     } else if (c == 1) {
@@ -128,8 +124,7 @@ std::string charToTimeUnit(const char& c)
     return "";
 }
 
-void doTimingStuff(std::shared_ptr<Simulation> simulation, std::string outFile)
-{
+void doTimingStuff(std::shared_ptr<Simulation> simulation, std::string outFile) {
     // fetch profiling data
     std::map<std::string, std::pair<char, std::vector<int64_t>>> times = simulation->GetAlgorithm()->GetTimes();
     std::vector<double> hitrates = simulation->GetAlgorithm()->GetHitrates();
@@ -457,8 +452,7 @@ void doTimingStuff(std::shared_ptr<Simulation> simulation, std::string outFile)
 #endif
 
 #if defined(VLEVEL) && !defined(BENCHMARK_3BMDA) && !defined(TESTS_3BMDA)
-void gatherAndPrintMessages()
-{
+void gatherAndPrintMessages() {
     int worldSize, worldRank;
     MPI_Comm_size(MPI_COMM_WORLD, &worldSize);
     MPI_Comm_rank(MPI_COMM_WORLD, &worldRank);
@@ -517,8 +511,7 @@ void gatherAndPrintMessages()
 }
 #endif
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char* argv[]) {
     // init MPI
     MPI_Init(&argc, &argv);
 
@@ -547,14 +540,20 @@ int main(int argc, char* argv[])
     std::shared_ptr<Simulation> simulation;
 
     switch (a.algorithm) {
-        case AlgorithmType::NATAType: simulation = createNATAContext(a.outputCSV); break;
+        case AlgorithmType::NATAType:
+            simulation = createNATAContext(a.outputCSV);
+            break;
         case AlgorithmType::P3BCAType:
             simulation = createP3BCAContext(
                 a.outputCSV,
                 Utility::getDecomposition(worldSize, (a.optimalDecomposition ? decompositions : decompositionsNaive)));
             break;
-        case AlgorithmType::AUTAType: simulation = createAUTAContext(a.outputCSV); break;
-        default: simulation = createNATAContext(a.outputCSV); break;
+        case AlgorithmType::AUTAType:
+            simulation = createAUTAContext(a.outputCSV);
+            break;
+        default:
+            simulation = createNATAContext(a.outputCSV);
+            break;
     }
 
     simulation->Init();

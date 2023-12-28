@@ -7,13 +7,11 @@ ClusteredGaussGenerator::ClusteredGaussGenerator(int numParticles, const std::ar
                                                  const std::array<double, 3> &distributionMean,
                                                  const std::array<double, 3> &distributionStdDev, int numClusters)
     : ParticleGenerator(numParticles, velocity, boxLength, bottomLeftCorner, mass, seed0, seed1),
-      distributionMean(distributionMean), distributionStdDev(distributionStdDev), numClusters(numClusters)
-{}
+      distributionMean(distributionMean), distributionStdDev(distributionStdDev), numClusters(numClusters) {}
 
 ClusteredGaussGenerator::~ClusteredGaussGenerator() {}
 
-void ClusteredGaussGenerator::Generate()
-{
+void ClusteredGaussGenerator::Generate() {
     // create random points in box
     std::vector<std::tuple<double, double, double>> points;
 
@@ -38,10 +36,9 @@ void ClusteredGaussGenerator::Generate()
     int id = 0;
     for (std::tuple<double, double, double> &p : points) {
         for (int i = 0; i < numParticles / numClusters; ++i) {
-            std::tuple<int, double, double, double, double, double, double, double, double, double, double> positions =
-                std::make_tuple(
-                    id++, std::get<0>(p) + distributions[0](generator), std::get<1>(p) + distributions[1](generator),
-                    std::get<2>(p) + distributions[2](generator), velocity[0], velocity[1], velocity[2], 0, 0, 0, mass);
+            std::tuple<int, double, double, double, double, double, double, double> positions = std::make_tuple(
+                id++, std::get<0>(p) + distributions[0](generator), std::get<1>(p) + distributions[1](generator),
+                std::get<2>(p) + distributions[2](generator), velocity[0], velocity[1], velocity[2], mass);
             this->particles.push_back(positions);
         }
     }

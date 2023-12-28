@@ -16,10 +16,8 @@
 #include "ParticleGenerator.hpp"
 #include "UniformGenerator.hpp"
 
-int main(int argc, char *argv[])
-{
-    std::vector<std::tuple<int, double, double, double, double, double, double, double, double, double, double>>
-        particles;
+int main(int argc, char *argv[]) {
+    std::vector<std::tuple<int, double, double, double, double, double, double, double>> particles;
     int numParticles = 0;
     std::array<double, 3> distributionMean;
     std::array<double, 3> distributionStdDev;
@@ -61,34 +59,75 @@ int main(int argc, char *argv[])
         int index = -1;
         struct option *opt = 0;
         int result = getopt_long_only(argc, argv, "n:m:d:o:v:w:a:b:p:q:", long_options, &index);
-        if (result == -1) break; /* end of list */
+        if (result == -1)
+            break; /* end of list */
         switch (result) {
-            case 'a': gen = ParticleGenerator::Str2Gen(optarg); break;
-            case 'b': numParticles = std::stoi(optarg); break;
-            case 'c': distributionMean[0] = distributionMean[1] = distributionMean[2] = std::stod(optarg); break;
-            case 'd': distributionStdDev[0] = distributionStdDev[1] = distributionStdDev[2] = std::stod(optarg); break;
-            case 'e': output = optarg; break;
-            case 'f': velocity[0] = std::stod(optarg); break;
-            case 'g': velocity[1] = std::stod(optarg); break;
-            case 'h': velocity[2] = std::stod(optarg); break;
-            case 'i': mass = std::stod(optarg); break;
-            case 'j': seed0 = std::stoul(optarg); break;
-            case 'k': seed1 = std::stoul(optarg); break;
-            case 'l': boxLength[0] = std::stod(optarg); break;
-            case 'm': boxLength[1] = std::stod(optarg); break;
-            case 'n': boxLength[2] = std::stod(optarg); break;
-            case 'o': numClusters = std::stoi(optarg); break;
-            case 'p': particleSpacing = std::stod(optarg); break;
-            case 'q': particlesPerDim[0] = std::stoul(optarg); break;
-            case 'r': particlesPerDim[1] = std::stoul(optarg); break;
-            case 's': particlesPerDim[2] = std::stoul(optarg); break;
+            case 'a':
+                gen = ParticleGenerator::Str2Gen(optarg);
+                break;
+            case 'b':
+                numParticles = std::stoi(optarg);
+                break;
+            case 'c':
+                distributionMean[0] = distributionMean[1] = distributionMean[2] = std::stod(optarg);
+                break;
+            case 'd':
+                distributionStdDev[0] = distributionStdDev[1] = distributionStdDev[2] = std::stod(optarg);
+                break;
+            case 'e':
+                output = optarg;
+                break;
+            case 'f':
+                velocity[0] = std::stod(optarg);
+                break;
+            case 'g':
+                velocity[1] = std::stod(optarg);
+                break;
+            case 'h':
+                velocity[2] = std::stod(optarg);
+                break;
+            case 'i':
+                mass = std::stod(optarg);
+                break;
+            case 'j':
+                seed0 = std::stoul(optarg);
+                break;
+            case 'k':
+                seed1 = std::stoul(optarg);
+                break;
+            case 'l':
+                boxLength[0] = std::stod(optarg);
+                break;
+            case 'm':
+                boxLength[1] = std::stod(optarg);
+                break;
+            case 'n':
+                boxLength[2] = std::stod(optarg);
+                break;
+            case 'o':
+                numClusters = std::stoi(optarg);
+                break;
+            case 'p':
+                particleSpacing = std::stod(optarg);
+                break;
+            case 'q':
+                particlesPerDim[0] = std::stoul(optarg);
+                break;
+            case 'r':
+                particlesPerDim[1] = std::stoul(optarg);
+                break;
+            case 's':
+                particlesPerDim[2] = std::stoul(optarg);
+                break;
             case 0:
                 opt = (struct option *)&(long_options[index]);
                 printf("'%s' was specified.", opt->name);
-                if (opt->has_arg == required_argument) printf("Arg: <%s>", optarg);
+                if (opt->has_arg == required_argument)
+                    printf("Arg: <%s>", optarg);
                 printf("\n");
                 break;
-            default: break;
+            default:
+                break;
         }
     }
 
@@ -118,7 +157,8 @@ int main(int argc, char *argv[])
                                                             seed0, seed1);
             break;
 
-        default: break;
+        default:
+            break;
     }
 
     pGenerator->Generate();
@@ -127,13 +167,12 @@ int main(int argc, char *argv[])
 
     std::ofstream csvFile;
     csvFile.open(output);
-    csvFile << "ID, pX, pY, pZ, vX, vY, vZ, aX, aY, aZ, m\n";
+    csvFile << "ID, pX, pY, pZ, vX, vY, vZ, m\n";
     for (size_t i = 0; i < particles.size(); i++) {
         csvFile << std::get<0>(particles[i]) << ", " << std::get<1>(particles[i]) << ", " << std::get<2>(particles[i])
                 << ", " << std::get<3>(particles[i]) << ", " << std::get<4>(particles[i]) << ", "
                 << std::get<5>(particles[i]) << ", " << std::get<6>(particles[i]) << ", " << std::get<7>(particles[i])
-                << ", " << std::get<8>(particles[i]) << ", " << std::get<9>(particles[i]) << ", "
-                << std::get<10>(particles[i]) << "\n";
+                << "\n";
     }
     csvFile.close();
 

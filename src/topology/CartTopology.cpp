@@ -3,8 +3,7 @@
 CartTopology::CartTopology(std::vector<int> decomposition) : decomposition(decomposition) {}
 CartTopology::~CartTopology() {}
 
-void CartTopology::Init(std::shared_ptr<Simulation> simulation)
-{
+void CartTopology::Init(std::shared_ptr<Simulation> simulation) {
     Topology::Init(simulation);
 
     int numDims = this->decomposition.size();
@@ -57,8 +56,7 @@ void CartTopology::Init(std::shared_ptr<Simulation> simulation)
     }
 }
 
-std::tuple<int, int> CartTopology::Shift(int dim, int dir)
-{
+std::tuple<int, int> CartTopology::Shift(int dim, int dir) {
     int source, dest;
     MPI_Cart_shift(this->comm, dim, dir, &source, &dest);
     return std::tuple<int, int>{source, dest};

@@ -3,8 +3,7 @@
 AtomDecomposition::AtomDecomposition() {}
 AtomDecomposition::~AtomDecomposition() {}
 
-void AtomDecomposition::Init(std::shared_ptr<Simulation> simulation)
-{
+void AtomDecomposition::Init(std::shared_ptr<Simulation> simulation) {
     DomainDecomposition::Init(simulation);
 
     this->worldRank = this->simulation->GetTopology()->GetWorldRank();
@@ -40,11 +39,3 @@ void AtomDecomposition::Init(std::shared_ptr<Simulation> simulation)
         myParticles.push_back(Utility::Particle(true));
     }
 }
-
-void AtomDecomposition::Update(double dt, Eigen::Vector3d gForce)
-{
-    // update all my particles
-    this->updateMyParticles(dt, gForce);
-}
-
-void AtomDecomposition::UpdatePredictorStage(double dt) { this->updateMyParticlesPredictorStage(dt); }

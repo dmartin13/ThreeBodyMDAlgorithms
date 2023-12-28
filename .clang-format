@@ -6,8 +6,8 @@ TabWidth: 4
 ColumnLimit: 0
 AccessModifierOffset: -4
 NamespaceIndentation: All
-AllowShortIfStatementsOnASingleLine: true
-AllowShortCaseLabelsOnASingleLine: true
+AllowShortIfStatementsOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: false
 PointerAlignment: Right 
 BreakBeforeBraces: Custom
 ColumnLimit: 120
@@ -20,8 +20,8 @@ BraceWrapping:
   AfterClass: false
   AfterControlStatement: false
   AfterEnum: false
-  AfterFunction: true
-  AfterNamespace: true
+  AfterFunction: false
+  AfterNamespace: false
   AfterObjCDeclaration: false
   AfterStruct: false
   AfterUnion: false
