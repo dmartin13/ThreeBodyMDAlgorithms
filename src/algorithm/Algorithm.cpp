@@ -83,13 +83,13 @@ std::tuple<uint64_t, uint64_t> Algorithm::calculateInteractions(std::vector<Util
                 }
                 numPossibleParticleInteractions++;
                 // only calculate if this triplet is inside the cutoff
-                if (cutoff > 0) {
-                    if (b0[i].GetSqrDistPeriodic(b1[j], physicalDomainSize) > sqrCutoff ||
-                        b0[i].GetSqrDistPeriodic(b2[k], physicalDomainSize) > sqrCutoff ||
-                        b1[j].GetSqrDistPeriodic(b2[k], physicalDomainSize) > sqrCutoff) {
-                        continue;
-                    }
-                }
+                // if (cutoff > 0) {
+                //     if (b0[i].GetSqrDistPeriodic(b1[j], physicalDomainSize) > sqrCutoff ||
+                //         b0[i].GetSqrDistPeriodic(b2[k], physicalDomainSize) > sqrCutoff ||
+                //         b1[j].GetSqrDistPeriodic(b2[k], physicalDomainSize) > sqrCutoff) {
+                //         continue;
+                //     }
+                // }
 
 #ifdef PROFILE_3BMDA
                 std::chrono::time_point<std::chrono::system_clock> start1;
@@ -185,9 +185,9 @@ void Algorithm::SumUpParticles(std::vector<Utility::Particle> &b0, std::vector<U
         b0[i].f0Y += b1[i].f0Y + b2[i].f0Y;
         b0[i].f0Z += b1[i].f0Z + b2[i].f0Z;
 
-        b0[i].f0X += b1[i].f0X + b2[i].f0X;
-        b0[i].f0Y += b1[i].f0Y + b2[i].f0Y;
-        b0[i].f0Z += b1[i].f0Z + b2[i].f0Z;
+        b0[i].f1X += b1[i].f1X + b2[i].f1X;
+        b0[i].f1Y += b1[i].f1Y + b2[i].f1Y;
+        b0[i].f1Z += b1[i].f1Z + b2[i].f1Z;
     }
 #ifdef PROFILE_3BMDA
     end = std::chrono::system_clock::now();

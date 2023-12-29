@@ -31,6 +31,7 @@ std::shared_ptr<DomainDecomposition> Simulation::GetDecomposition() { return thi
 void Simulation::Start() {
     // TODO: get this from config
     const bool respaActive = respaStepSize > 0;
+    std::cout << "respaActive " << (respaActive ? "true" : "false") << std::endl;
 
     for (int i = 0; i < iterations; ++i) {
 #ifdef MEASURESIMSTEP_3BMDA
@@ -39,44 +40,48 @@ void Simulation::Start() {
         start = std::chrono::system_clock::now();
 #endif
         // determine if this iteration is a respa step
-        const bool isRespaIteration = respaActive and (i % respaStepSize == 0);
-        const bool nextIsRespaIteration = respaActive and ((i + 1) % respaStepSize == 0);
+        // const bool isRespaIteration = respaActive and (i % respaStepSize == 0);
+        // const bool nextIsRespaIteration = respaActive and ((i + 1) % respaStepSize == 0);
 
-        // determine the forceType to calculate in this iteration
-        auto forceTypeToCalculate = ForceType::TwoAndThreeBody;
-        if (respaActive and (not nextIsRespaIteration)) {
-            // if respa should be used but this is not a respa iteration then only calculate two body interactions
-            forceTypeToCalculate = ForceType::TwoBody;
-        }
+        // // determine the forceType to calculate in this iteration
+        // auto forceTypeToCalculate = ForceType::TwoAndThreeBody;
+        // if (respaActive and (not nextIsRespaIteration)) {
+        //     // if respa should be used but this is not a respa iteration then only calculate two body interactions
+        //     forceTypeToCalculate = ForceType::TwoBody;
+        // }
 
-        if (respaActive and isRespaIteration) {
-            // update velocities with three body force
-            decomposition->UpdateVelocities(dt, ForceType::ThreeBody, respaStepSize);
-        }
+        // if (respaActive and isRespaIteration) {
+        //     // update velocities with three body force
+        //     decomposition->UpdateVelocities(dt, ForceType::ThreeBody, respaStepSize);
+        // }
 
         // the following part is the inner loop of the respa algorithm
         {
             // update particle positions using the two-body force
-            decomposition->UpdatePositions(dt, gForce, respaActive ? ForceType::TwoBody : ForceType::TwoAndThreeBody);
+            // decomposition->UpdatePositions(dt, gForce, respaActive ? ForceType::TwoBody :
+            // ForceType::TwoAndThreeBody);
+            decomposition->UpdatePositions(dt, gForce, ForceType::TwoBody);
             MPI_Barrier(this->topology->GetComm());
 
             // execute algorithm... force calculation
             // numInteractions.push_back(this->algorithm->SimulationStep());
-            numInteractions.push_back(this->algorithm->SimulationStep(forceTypeToCalculate));
+            // numInteractions.push_back(this->algorithm->SimulationStep(forceTypeToCalculate));
+            numInteractions.push_back(this->algorithm->SimulationStep(ForceType::TwoBody));
             MPI_Barrier(this->topology->GetComm());
 
             // update the velocities
-            decomposition->UpdateVelocities(dt, respaActive ? ForceType::TwoBody : ForceType::TwoAndThreeBody,
-                                            respaStepSize);
+            // decomposition->UpdateVelocities(dt, respaActive ? ForceType::TwoBody : ForceType::TwoAndThreeBody,
+            //                                 respaStepSize);
+            decomposition->UpdateVelocities(dt, ForceType::TwoBody, respaStepSize);
             MPI_Barrier(this->topology->GetComm());
         }
 
         // check if the next iteration is a respa iteration
-        if (respaActive and nextIsRespaIteration) {
-            // 3-body force has already bee calculated in inner loop
-            // update velocities using three body force
-            decomposition->UpdateVelocities(dt, ForceType::ThreeBody, respaStepSize);
-        }
+        // if (respaActive and nextIsRespaIteration) {
+        //     // 3-body force has already bee calculated in inner loop
+        //     // update velocities using three body force
+        //     decomposition->UpdateVelocities(dt, ForceType::ThreeBody, respaStepSize);
+        // }
 
 #ifdef MEASURESIMSTEP_3BMDA
         end = std::chrono::system_clock::now();
