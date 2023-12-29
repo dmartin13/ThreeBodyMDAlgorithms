@@ -316,7 +316,11 @@ std::tuple<uint64_t, uint64_t> EAUTA::SimulationStep(ForceType forceType) {
             CalculateInteractions(this->b1, this->b1, this->b1, this->b1Owner, this->b1Owner, this->b1Owner);
             CalculateInteractions(this->b1, this->b1, this->b2, this->b1Owner, this->b1Owner, this->b2Owner);
             CalculateInteractions(this->b0, this->b0, this->b2, this->b0Owner, this->b0Owner, this->b2Owner);
-            CalculateInteractions(this->b0, this->b1, this->b2, this->b0Owner, this->b1Owner, this->b2Owner);
+
+            // special case
+            int thirdID = this->worldRank / (this->worldSize / 3);
+            // Calculate one third of the interactions between b0, b1, b2
+            calculateOneThirdOfInteractions(thirdID);
         }
 
         if (forceType == ForceType::TwoBody or forceType == ForceType::TwoAndThreeBody) {

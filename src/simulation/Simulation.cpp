@@ -29,9 +29,7 @@ std::shared_ptr<TriwisePotential> Simulation::GetTriwisePotential() { return thi
 std::shared_ptr<DomainDecomposition> Simulation::GetDecomposition() { return this->decomposition; }
 
 void Simulation::Start() {
-    // TODO: get this from config
     const bool respaActive = respaStepSize > 0;
-    std::cout << "respaActive " << (respaActive ? "true" : "false") << std::endl;
 
     for (int i = 0; i < iterations; ++i) {
 #ifdef MEASURESIMSTEP_3BMDA
