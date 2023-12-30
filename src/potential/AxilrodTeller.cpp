@@ -3,17 +3,6 @@
 AxilrodTeller::AxilrodTeller(double nu) : nu(nu) {}
 
 void AxilrodTeller::CalculateForces(Utility::Particle &i, Utility::Particle &j, Utility::Particle &k) {
-    /*
-    #ifdef PROFILE_3BMDA
-        std::chrono::time_point<std::chrono::system_clock> start;
-        std::chrono::time_point<std::chrono::system_clock> end;
-        start = std::chrono::system_clock::now();
-    #endif
-    */
-
-    // see "The Role of Three-Body Interactions on the Equilibrium and Non-Equilibrium Properties of Fluids from
-    // Molecular Simulation" for that
-
     // we assume forces are set to 0 for each particle
 
     // sides of triangle
@@ -22,7 +11,6 @@ void AxilrodTeller::CalculateForces(Utility::Particle &i, Utility::Particle &j, 
     Eigen::Vector3d c = (j.GetR() - k.GetR());
 
     // distances and powers of distances
-
     double d1a = a.norm();
     double d1b = b.norm();
     double d1c = c.norm();
@@ -47,17 +35,17 @@ void AxilrodTeller::CalculateForces(Utility::Particle &i, Utility::Particle &j, 
     double d6b = d5b * d1b;
     double d6c = d5c * d1c;
 
-    double dXa = j.pX - i.pX;
-    double dYa = j.pY - i.pY;
-    double dZa = j.pZ - i.pZ;
+    double dXa = i.pX - j.pX;
+    double dYa = i.pY - j.pY;
+    double dZa = i.pZ - j.pZ;
 
-    double dXb = k.pX - i.pX;
-    double dYb = k.pY - i.pY;
-    double dZb = k.pZ - i.pZ;
+    double dXb = i.pX - k.pX;
+    double dYb = i.pY - k.pY;
+    double dZb = i.pZ - k.pZ;
 
-    double dXc = k.pX - j.pX;
-    double dYc = k.pY - j.pY;
-    double dZc = k.pZ - j.pZ;
+    double dXc = j.pX - k.pX;
+    double dYc = j.pY - k.pY;
+    double dZc = j.pZ - k.pZ;
 
     double dVdRa, dVdRb, dVdRc;
 
@@ -77,70 +65,15 @@ void AxilrodTeller::CalculateForces(Utility::Particle &i, Utility::Particle &j, 
              1. / (d2c * d3b * d5a) - 1. / (d2c * d5b * d3a) - 3. / (d4c * d1b * d5a) - 3. / (d4c * d5b * d1a) -
              5. / (d6c * d1b * d3a) - 5. / (d6c * d3b * d1a) + 6. / (d4c * d3b * d3a));
 
-    double newIfXContrib = dXa * dVdRa + dXb * dVdRb;
-    double newIfYContrib = dYa * dVdRa + dYb * dVdRb;
-    double newIfZContrib = dZa * dVdRa + dZb * dVdRb;
+    i.f1X = i.f1X - dXa * dVdRa - dXb * dVdRb;
+    i.f1Y = i.f1Y - dYa * dVdRa - dYb * dVdRb;
+    i.f1Z = i.f1Z - dZa * dVdRa - dZb * dVdRb;
 
-    double newJfXContrib = dXa * (-dVdRa) + dXc * dVdRc;
-    double newJfYContrib = dYa * (-dVdRa) + dYc * dVdRc;
-    double newJfZContrib = dZa * (-dVdRa) + dZc * dVdRc;
+    j.f1X = j.f1X - dXa * (-dVdRa) - dXc * dVdRc;
+    j.f1Y = j.f1Y - dYa * (-dVdRa) - dYc * dVdRc;
+    j.f1Z = j.f1Z - dZa * (-dVdRa) - dZc * dVdRc;
 
-    double newKfXContrib = dXb * (-dVdRb) + dXc * (-dVdRc);
-    double newKfYContrib = dYb * (-dVdRb) + dYc * (-dVdRc);
-    double newKfZContrib = dZb * (-dVdRb) + dZc * (-dVdRc);
-
-#if defined(USE_OMP) && defined(OPENMPAVAIL)
-    {
-#pragma omp atomic
-        i.fX -= newIfXContrib;
-#pragma omp atomic
-        i.fY -= newIfYContrib;
-#pragma omp atomic
-        i.fZ -= newIfZContrib;
-
-#pragma omp atomic
-        j.fX -= newJfXContrib;
-#pragma omp atomic
-        j.fY -= newJfYContrib;
-#pragma omp atomic
-        j.fZ -= newJfZContrib;
-
-#pragma omp atomic
-        k.fX -= newKfXContrib;
-#pragma omp atomic
-        k.fY -= newKfYContrib;
-#pragma omp atomic
-        k.fZ -= newKfZContrib;
-    }
-#else
-    i.f1X -= newIfXContrib;
-    i.f1Y -= newIfYContrib;
-    i.f1Z -= newIfZContrib;
-
-    j.f1X -= newJfXContrib;
-    j.f1Y -= newJfYContrib;
-    j.f1Z -= newJfZContrib;
-
-    k.f1X -= newKfXContrib;
-    k.f1Y -= newKfYContrib;
-    k.f1Z -= newKfZContrib;
-#endif
-    /*
-    #ifdef PROFILE_3BMDA
-        end = std::chrono::system_clock::now();
-        auto elapsed_time = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
-
-        // check for over & underflow. https://stackoverflow.com/a/1514309
-        if (elapsed_time.count() > 0 && this->timeAcc > std::numeric_limits<int64_t>::max() - elapsed_time.count()) {
-            std::cout << "Overflow Warning for profiling in CalculateForces" << std::endl;
-        }
-        if (elapsed_time.count() < 0 && this->timeAcc < std::numeric_limits<int64_t>::min() - elapsed_time.count()) {
-            std::cout << "Underflow Warning for profiling in CalculateForces" << std::endl;
-        }
-
-        this->timeAcc += elapsed_time.count();
-
-        this->counter++;
-    #endif
-    */
+    k.f1X = k.f1X - dXb * (-dVdRb) - dXc * (-dVdRc);
+    k.f1Y = k.f1Y - dYb * (-dVdRb) - dYc * (-dVdRc);
+    k.f1Z = k.f1Z - dZb * (-dVdRb) - dZc * (-dVdRc);
 }

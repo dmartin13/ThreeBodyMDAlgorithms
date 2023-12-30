@@ -31,5 +31,7 @@
 #include "topology/Topology.hpp"
 #include "utility/decompositions.hpp"
 #include "utility/utility.hpp"
+#include "helpers/axilrodTellerMuto.hpp"
+#include "helpers/lennardJones.hpp"
 
 #endif

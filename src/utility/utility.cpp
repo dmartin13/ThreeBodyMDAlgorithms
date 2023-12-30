@@ -45,14 +45,15 @@ namespace Utility {
     void writeStepToCSVWithForces(std::string file, std::vector<Particle> &particles) {
         std::ofstream csvFile;
         csvFile.open(file);
-        csvFile << "ID, pX, pY, pZ, vX, vY, vZ, m, fX, fY, fZ\n";
+        csvFile << "ID, pX, pY, pZ, vX, vY, vZ, m, fX0, fY0, fZ0, fX1, fY1, fZ1\n";
         for (size_t i = 0; i < particles.size(); i++) {
             if (particles[i].isDummy)
                 continue;
             csvFile << particles[i].ID << ", " << particles[i].pX << ", " << particles[i].pY << ", " << particles[i].pZ
                     << ", " << particles[i].vX << ", " << particles[i].vY << ", " << particles[i].vZ << ", "
-                    << particles[i].mass << ", " << (particles[i].f0X + particles[i].f1X) << ", "
-                    << (particles[i].f0Y + particles[i].f1Y) << ", " << (particles[i].f0Z + particles[i].f1Z) << "\n";
+                    << particles[i].mass << ", " << particles[i].f0X << ", " << particles[i].f0Y << ", "
+                    << particles[i].f0Z << ", " << particles[i].f1X << ", " << particles[i].f1Y << ", "
+                    << particles[i].f1Z << "\n";
         }
         csvFile.close();
     }
