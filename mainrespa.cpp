@@ -10,6 +10,8 @@
 #include "potential/AxilrodTeller.hpp"
 #include "potential/LennardJones.hpp"
 #include "simulation/Simulation.hpp"
+#include "tests/helpers/axilrodTellerMuto.hpp"
+#include "tests/helpers/lennardJones.hpp"
 #include "topology/RingTopology.hpp"
 #include "utility/cli.hpp"
 
@@ -33,7 +35,7 @@ std::shared_ptr<Simulation> createContext() {
 
     // set up simulation
     std::shared_ptr<Simulation> simulation =
-        std::make_shared<Simulation>(a.iterations, a.respaStepSize, eauta, ringTopology, lj, axilrodTeller,
+        std::make_shared<Simulation>(a, a.iterations, a.respaStepSize, eauta, ringTopology, lj, axilrodTeller,
                                      atomDecomposition, &mpiParticleType, particles, a.deltaT, a.gForce, a.outputCSV);
     return simulation;
 }
@@ -96,6 +98,54 @@ void gatherAndPrintMessages() {
     }
 }
 
+void forceCalcTest() {
+    const double sigma = 1;
+    const double epsilon = 1;
+    const double nu = 1;
+
+    const auto p0 = Eigen::Vector3d{1.0, 1.0, 0.0};
+    const auto p1 = Eigen::Vector3d{5.0, 9.0, 0.0};
+    const auto p2 = Eigen::Vector3d{9.0, 1.0, 0.0};
+
+    std::array<Eigen::Vector3d, 3> pairwiseForces = {Eigen::Vector3d{0, 0, 0}, Eigen::Vector3d{0, 0, 0},
+                                                     Eigen::Vector3d{0, 0, 0}};
+
+    std::array<Eigen::Vector3d, 3> triwiseForces = {Eigen::Vector3d{0, 0, 0}, Eigen::Vector3d{0, 0, 0},
+                                                    Eigen::Vector3d{0, 0, 0}};
+
+    // calculate pairwise interactions
+    auto fp0p1 = calculateLJForce(p0, p1, sigma, epsilon);
+    auto fp0p2 = calculateLJForce(p0, p2, sigma, epsilon);
+    auto fp1p2 = calculateLJForce(p1, p2, sigma, epsilon);
+
+    pairwiseForces[0] += std::get<0>(fp0p1);
+    pairwiseForces[0] += std::get<0>(fp0p2);
+
+    pairwiseForces[1] += std::get<1>(fp0p1);
+    pairwiseForces[1] += std::get<0>(fp1p2);
+
+    pairwiseForces[2] += std::get<1>(fp0p2);
+    pairwiseForces[2] += std::get<1>(fp1p2);
+
+    // calculate triplet interactions
+    auto fp0p1p2 = calculateATMForce(p0, p1, p2, nu);
+
+    triwiseForces[0] += std::get<0>(fp0p1p2);
+
+    triwiseForces[1] += std::get<1>(fp0p1p2);
+
+    triwiseForces[2] += std::get<2>(fp0p1p2);
+
+    for (int i = 0; i < 3; ++i) {
+        std::cout << "total two-body force of p" << i << ": (" << pairwiseForces[i][0] << ", " << pairwiseForces[i][1]
+                  << ", " << pairwiseForces[i][2] << "), total three-body force of p" << i << ": ("
+                  << triwiseForces[i][0] << ", " << triwiseForces[i][1] << ", " << triwiseForces[i][2]
+                  << "), total sum: (" << std::format("{}", pairwiseForces[i][0] + triwiseForces[i][0]) << ", "
+                  << std::format("{}", pairwiseForces[i][1] + triwiseForces[i][1]) << ", "
+                  << std::format("{}", pairwiseForces[i][2] + triwiseForces[i][2]) << ")" << std::endl;
+    }
+}
+
 int main(int argc, char* argv[]) {
     // init MPI
     MPI_Init(&argc, &argv);
@@ -129,6 +179,10 @@ int main(int argc, char* argv[]) {
 
     // print messages
     gatherAndPrintMessages();
+
+    if (worldRank == 0) {
+        forceCalcTest();
+    }
 
     // finalize
     MPI_Type_free(&mpiParticleType);

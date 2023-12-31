@@ -143,8 +143,10 @@ std::shared_ptr<Simulation> createNATAContext(int iterations, double deltaT, Eig
     // std::shared_ptr<Potential> potential, std::shared_ptr<DomainDecomposition> decomposition,
     // MPI_Datatype* mpiParticleType, std::vector<Utility::Particle>& particles, double dt,
     // Eigen::Vector3d gForce
+    Utility::cliArguments args;
+    args.useThermostat = false;
     std::shared_ptr<Simulation> simulation =
-        std::make_shared<Simulation>(iterations, 0, nata, ringTopology, lj, axilrodTeller, atomDecomposition,
+        std::make_shared<Simulation>(args, iterations, 0, nata, ringTopology, lj, axilrodTeller, atomDecomposition,
                                      &mpiParticleType, particles, deltaT, gForce);
     return simulation;
 }
@@ -169,9 +171,11 @@ std::shared_ptr<Simulation> createP3BCAContext(int iterations, double deltaT, Ei
     // std::shared_ptr<Potential> potential, std::shared_ptr<DomainDecomposition> decomposition,
     // MPI_Datatype* mpiParticleType, std::vector<Utility::Particle>& particles, double dt,
     // Eigen::Vector3d gForce
+    Utility::cliArguments args;
+    args.useThermostat = false;
     std::shared_ptr<Simulation> simulation =
-        std::make_shared<Simulation>(iterations, 0, p3bca, cartTopology, lj, axilrodTeller, regularGridDecomposition,
-                                     &mpiParticleType, particles, deltaT, gForce);
+        std::make_shared<Simulation>(args, iterations, 0, p3bca, cartTopology, lj, axilrodTeller,
+                                     regularGridDecomposition, &mpiParticleType, particles, deltaT, gForce);
     return simulation;
 }
 
@@ -194,8 +198,10 @@ std::shared_ptr<Simulation> createAUTAContext(int iterations, double deltaT, Eig
     // std::shared_ptr<Potential> potential, std::shared_ptr<DomainDecomposition> decomposition,
     // MPI_Datatype* mpiParticleType, std::vector<Utility::Particle>& particles, double dt,
     // Eigen::Vector3d gForce
+    Utility::cliArguments args;
+    args.useThermostat = false;
     std::shared_ptr<Simulation> simulation =
-        std::make_shared<Simulation>(iterations, 0, auta, ringTopology, lj, axilrodTeller, atomDecomposition,
+        std::make_shared<Simulation>(args, iterations, 0, auta, ringTopology, lj, axilrodTeller, atomDecomposition,
                                      &mpiParticleType, particles, deltaT, gForce);
     return simulation;
 }

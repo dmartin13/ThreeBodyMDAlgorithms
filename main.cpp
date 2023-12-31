@@ -50,7 +50,7 @@ std::shared_ptr<Simulation> createNATAContext(std::string csvOut) {
     // MPI_Datatype* mpiParticleType, std::vector<Utility::Particle>& particles, double dt,
     // Eigen::Vector3d gForce
     std::shared_ptr<Simulation> simulation =
-        std::make_shared<Simulation>(a.iterations, a.respaStepSize, nata, ringTopology, lj, axilrodTeller,
+        std::make_shared<Simulation>(a, a.iterations, a.respaStepSize, nata, ringTopology, lj, axilrodTeller,
                                      atomDecomposition, &mpiParticleType, particles, a.deltaT, a.gForce, csvOut);
     return simulation;
 }
@@ -75,7 +75,7 @@ std::shared_ptr<Simulation> createP3BCAContext(std::string csvOut, std::vector<i
     // MPI_Datatype* mpiParticleType, std::vector<Utility::Particle>& particles, double dt,
     // Eigen::Vector3d gForce
     std::shared_ptr<Simulation> simulation =
-        std::make_shared<Simulation>(a.iterations, a.respaStepSize, p3bca, cartTopology, lj, axilrodTeller,
+        std::make_shared<Simulation>(a, a.iterations, a.respaStepSize, p3bca, cartTopology, lj, axilrodTeller,
                                      regularGridDecomposition, &mpiParticleType, particles, a.deltaT, a.gForce, csvOut);
     return simulation;
 }
@@ -100,7 +100,7 @@ std::shared_ptr<Simulation> createAUTAContext(std::string csvOut) {
     // MPI_Datatype* mpiParticleType, std::vector<Utility::Particle>& particles, double dt,
     // Eigen::Vector3d gForce
     std::shared_ptr<Simulation> simulation =
-        std::make_shared<Simulation>(a.iterations, a.respaStepSize, auta, ringTopology, lj, axilrodTeller,
+        std::make_shared<Simulation>(a, a.iterations, a.respaStepSize, auta, ringTopology, lj, axilrodTeller,
                                      atomDecomposition, &mpiParticleType, particles, a.deltaT, a.gForce, csvOut);
     return simulation;
 }

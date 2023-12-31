@@ -4,14 +4,17 @@
 #include <chrono>
 #endif
 
+#include "Thermostat.hpp"
 #include "algorithm/Algorithm.hpp"
 #include "fwd.hpp"
 #include "potential/PairwisePotential.hpp"
 #include "potential/Potential.hpp"
 #include "potential/TriwisePotential.hpp"
+#include "utility/cli.hpp"
 
 class Simulation : public std::enable_shared_from_this<Simulation> {
 private:
+    Utility::cliArguments args;
     int iterations;
     size_t respaStepSize;
     std::shared_ptr<Algorithm> algorithm;
@@ -30,7 +33,7 @@ private:
     void writeSimulationStepToCSV(std::string file);
 
 public:
-    Simulation(int iterations, int respaStepSize, std::shared_ptr<Algorithm> algorithm,
+    Simulation(Utility::cliArguments& args, int iterations, int respaStepSize, std::shared_ptr<Algorithm> algorithm,
                std::shared_ptr<Topology> topology, std::shared_ptr<PairwisePotential> pairwisepotential,
                std::shared_ptr<TriwisePotential> triwisepotential, std::shared_ptr<DomainDecomposition> decomposition,
                MPI_Datatype* mpiParticleType, std::vector<Utility::Particle>& particles, double dt,

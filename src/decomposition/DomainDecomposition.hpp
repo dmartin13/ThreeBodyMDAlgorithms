@@ -22,7 +22,7 @@ public:
 
     void UpdatePositions(double dt, Eigen::Vector3d gForce, ForceType forceTypeToUse);
     void UpdateVelocities(double dt, ForceType forceType, size_t respaStepSize);
-    std::vector<Utility::Particle> GetMyParticles();
-    void SetMyParticles(std::vector<Utility::Particle> &particles);
+    std::vector<Utility::Particle>& GetMyParticles();
+    void SetMyParticles(std::vector<Utility::Particle>& particles);
     int GetNumOfMyParticles();
 };

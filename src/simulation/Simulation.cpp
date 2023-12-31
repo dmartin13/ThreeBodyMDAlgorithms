@@ -1,12 +1,13 @@
 #include "Simulation.hpp"
 
-Simulation::Simulation(int iterations, int respaStepSize, std::shared_ptr<Algorithm> algorithm,
-                       std::shared_ptr<Topology> topology, std::shared_ptr<PairwisePotential> pairwisepotential,
+Simulation::Simulation(Utility::cliArguments& args, int iterations, int respaStepSize,
+                       std::shared_ptr<Algorithm> algorithm, std::shared_ptr<Topology> topology,
+                       std::shared_ptr<PairwisePotential> pairwisepotential,
                        std::shared_ptr<TriwisePotential> triwisepotential,
                        std::shared_ptr<DomainDecomposition> decomposition, MPI_Datatype* mpiParticleType,
                        std::vector<Utility::Particle>& particles, double dt, Eigen::Vector3d gForce,
                        std::string csvOutput)
-    : iterations(iterations), respaStepSize(respaStepSize), algorithm(algorithm), topology(topology),
+    : args(args), iterations(iterations), respaStepSize(respaStepSize), algorithm(algorithm), topology(topology),
       pairwisepotential(pairwisepotential), triwisepotential(triwisepotential), decomposition(decomposition),
       mpiParticleType(mpiParticleType), particles(particles), dt(dt), gForce(gForce), csvOutput(csvOutput) {}
 
@@ -29,6 +30,10 @@ std::shared_ptr<TriwisePotential> Simulation::GetTriwisePotential() { return thi
 std::shared_ptr<DomainDecomposition> Simulation::GetDecomposition() { return this->decomposition; }
 
 void Simulation::Start() {
+    if (args.addBrownianMotion) {
+        Thermostat::addBrownianMotion(decomposition->GetMyParticles(), args.targetTemperature);
+    }
+
     const bool respaActive = respaStepSize > 0;
 
     for (int i = 0; i < iterations; ++i) {
@@ -66,6 +71,13 @@ void Simulation::Start() {
             // update the velocities
             decomposition->UpdateVelocities(dt, respaActive ? ForceType::TwoBody : ForceType::TwoAndThreeBody,
                                             respaStepSize);
+
+            if (args.useThermostat) {
+                if (i % args.thermostatInterval == 0) {
+                    Thermostat::apply(decomposition->GetMyParticles(), args.targetTemperature, args.deltaTemperature);
+                }
+            }
+
             MPI_Barrier(this->topology->GetComm());
         }
 
