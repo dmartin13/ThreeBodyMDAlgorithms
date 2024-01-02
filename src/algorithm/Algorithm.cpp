@@ -13,26 +13,20 @@ void Algorithm::Init(std::shared_ptr<Simulation> simulation) {
     this->worldRank = this->simulation->GetTopology()->GetWorldRank();
 }
 
-std::tuple<uint64_t, uint64_t> Algorithm::CalculateInteractions(std::vector<Utility::Particle> &b0,
-                                                                std::vector<Utility::Particle> &b1,
-                                                                std::vector<Utility::Particle> &b2, int b0Owner,
-                                                                int b1Owner, int b2Owner) {
-    return calculateInteractions(b0, b1, b2, b0Owner, b1Owner, b2Owner, 0, -1);
+void Algorithm::CalculateInteractions(std::vector<Utility::Particle> &b0, std::vector<Utility::Particle> &b1,
+                                      std::vector<Utility::Particle> &b2, int b0Owner, int b1Owner, int b2Owner) {
+    calculateTriwiseInteractions(b0, b1, b2, b0Owner, b1Owner, b2Owner, 0, -1);
 }
 
-std::tuple<uint64_t, uint64_t> Algorithm::CalculateInteractions(std::vector<Utility::Particle> &b0,
-                                                                std::vector<Utility::Particle> &b1,
-                                                                std::vector<Utility::Particle> &b2, int b0Owner,
-                                                                int b1Owner, int b2Owner, int b0Start, int b0NumSteps) {
-    return calculateInteractions(b0, b1, b2, b0Owner, b1Owner, b2Owner, b0Start, b0NumSteps);
+void Algorithm::CalculateInteractions(std::vector<Utility::Particle> &b0, std::vector<Utility::Particle> &b1,
+                                      std::vector<Utility::Particle> &b2, int b0Owner, int b1Owner, int b2Owner,
+                                      int b0Start, int b0NumSteps) {
+    calculateTriwiseInteractions(b0, b1, b2, b0Owner, b1Owner, b2Owner, b0Start, b0NumSteps);
 }
 
-std::tuple<uint64_t, uint64_t> Algorithm::calculateInteractions(std::vector<Utility::Particle> &b0,
-                                                                std::vector<Utility::Particle> &b1,
-                                                                std::vector<Utility::Particle> &b2, int b0Owner,
-                                                                int b1Owner, int b2Owner, int b0Start, int b0NumSteps) {
-    uint64_t numActParticleInteractions = 0;
-    uint64_t numPossibleParticleInteractions = 0;
+void Algorithm::calculateTriwiseInteractions(std::vector<Utility::Particle> &b0, std::vector<Utility::Particle> &b1,
+                                      std::vector<Utility::Particle> &b2, int b0Owner, int b1Owner, int b2Owner,
+                                      int b0Start, int b0NumSteps) {
     for (size_t i = b0Start; i < (b0NumSteps != -1 ? (size_t)(b0Start + b0NumSteps) : b0.size()); ++i) {
         if (b0[i].isDummy) {
             continue;
@@ -52,16 +46,11 @@ std::tuple<uint64_t, uint64_t> Algorithm::calculateInteractions(std::vector<Util
                 if (b2[k].isDummy) {
                     continue;
                 }
-                numPossibleParticleInteractions++;
 
                 potential->CalculateForces(b0[i], b1[j], b2[k]);
-
-                numActParticleInteractions++;
             }
         }
     }
-
-    return std::tuple(numActParticleInteractions, numPossibleParticleInteractions);
 }
 
 void Algorithm::SumUpParticles(std::vector<Utility::Particle> &b0, std::vector<Utility::Particle> &b1,
@@ -89,17 +78,13 @@ void Algorithm::SumUpParticles(std::vector<Utility::Particle> &b0, std::vector<U
     }
 }
 
-std::tuple<uint64_t, uint64_t> Algorithm::CalculatePairwiseInteractions(std::vector<Utility::Particle> &b0,
-                                                                        std::vector<Utility::Particle> &b1, int b0Owner,
-                                                                        int b1Owner) {
-    return calculatePairwiseInteractions(b0, b1, b0Owner, b1Owner, 0, -1);
+void Algorithm::CalculatePairwiseInteractions(std::vector<Utility::Particle> &b0, std::vector<Utility::Particle> &b1,
+                                              int b0Owner, int b1Owner) {
+    calculatePairwiseInteractions(b0, b1, b0Owner, b1Owner, 0, -1);
 }
 
-std::tuple<uint64_t, uint64_t> Algorithm::calculatePairwiseInteractions(std::vector<Utility::Particle> &b0,
-                                                                        std::vector<Utility::Particle> &b1, int b0Owner,
-                                                                        int b1Owner, int b0Start, int b0NumSteps) {
-    uint64_t numActParticleInteractions = 0;
-    uint64_t numPossibleParticleInteractions = 0;
+void Algorithm::calculatePairwiseInteractions(std::vector<Utility::Particle> &b0, std::vector<Utility::Particle> &b1,
+                                              int b0Owner, int b1Owner, int b0Start, int b0NumSteps) {
     for (size_t i = b0Start; i < (b0NumSteps != -1 ? (size_t)(b0Start + b0NumSteps) : b0.size()); ++i) {
         if (b0[i].isDummy) {
             continue;
@@ -112,8 +97,4 @@ std::tuple<uint64_t, uint64_t> Algorithm::calculatePairwiseInteractions(std::vec
             pairwisePotential->CalculateForces(b0[i], b1[j]);
         }
     }
-
-    return std::tuple(numActParticleInteractions, numPossibleParticleInteractions);
 }
-
-int Algorithm::GetNumShifts() { return this->numShifts; }

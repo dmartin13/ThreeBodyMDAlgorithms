@@ -26,8 +26,6 @@ int EAUTA::shiftRight(std::vector<Utility::Particle>& buf, int owner) {
     MPI_Sendrecv_replace(buf.data(), buf.size(), *this->mpiParticleType, this->rightNeighbor, owner, this->leftNeighbor,
                          MPI_ANY_TAG, this->ringTopology->GetComm(), &status);
 
-    ++numShifts;
-
     // returns the owner
     return status.MPI_TAG;
 }
@@ -38,13 +36,11 @@ int EAUTA::shiftLeft(std::vector<Utility::Particle>& buf, int owner) {
     MPI_Sendrecv_replace(buf.data(), buf.size(), *this->mpiParticleType, this->leftNeighbor, owner, this->rightNeighbor,
                          MPI_ANY_TAG, this->ringTopology->GetComm(), &status);
 
-    ++numShifts;
-
     // returns the owner
     return status.MPI_TAG;
 }
 
-std::tuple<uint64_t, uint64_t> EAUTA::calculateOneThirdOfInteractions(int thirdID) {
+void EAUTA::calculateOneThirdOfInteractions(int thirdID) {
     std::vector<Utility::Particle>* b0Sorted = nullptr;
     std::vector<Utility::Particle>* b1Sorted = nullptr;
     std::vector<Utility::Particle>* b2Sorted = nullptr;
@@ -108,13 +104,12 @@ std::tuple<uint64_t, uint64_t> EAUTA::calculateOneThirdOfInteractions(int thirdI
         numSteps = b0Sorted->size() - 2 * numSteps;
     }
 
-    return this->CalculateInteractions(*b0Sorted, *b1Sorted, *b2Sorted, b0OwnerSorted, b1OwnerSorted, b2OwnerSorted,
-                                       start, numSteps);
+    this->CalculateInteractions(*b0Sorted, *b1Sorted, *b2Sorted, b0OwnerSorted, b1OwnerSorted, b2OwnerSorted, start,
+                                numSteps);
 }
 
-std::tuple<uint64_t, uint64_t> EAUTA::calculateOneHalfOfInteractions(std::vector<Utility::Particle>& b0,
-                                                                     std::vector<Utility::Particle>& b1, int b0Owner,
-                                                                     int b1Owner, int halfID) {
+void EAUTA::calculateOneHalfOfInteractions(std::vector<Utility::Particle>& b0, std::vector<Utility::Particle>& b1,
+                                           int b0Owner, int b1Owner, int halfID) {
     std::vector<Utility::Particle>* b0Sorted = nullptr;
     std::vector<Utility::Particle>* b1Sorted = nullptr;
     int b0OwnerSorted;
@@ -141,7 +136,7 @@ std::tuple<uint64_t, uint64_t> EAUTA::calculateOneHalfOfInteractions(std::vector
         numSteps = b0Sorted->size() - numSteps;
     }
 
-    return this->calculatePairwiseInteractions(*b0Sorted, *b1Sorted, b0OwnerSorted, b1OwnerSorted, start, numSteps);
+    this->calculatePairwiseInteractions(*b0Sorted, *b1Sorted, b0OwnerSorted, b1OwnerSorted, start, numSteps);
 }
 
 std::vector<Utility::Particle>* EAUTA::pickBuffer(int i) {
@@ -252,18 +247,13 @@ void EAUTA::sendBackParticles() {
     this->b2Owner = this->worldRank;
 }
 
-std::tuple<uint64_t, uint64_t> EAUTA::SimulationStep() { return SimulationStep(ForceType::TwoAndThreeBody); }
+void EAUTA::SimulationStep() { return SimulationStep(ForceType::TwoAndThreeBody); }
 
-std::tuple<uint64_t, uint64_t> EAUTA::SimulationStep(ForceType forceType) {
+void EAUTA::SimulationStep(ForceType forceType) {
     // TODO: avoid this copy
     this->b1 = this->simulation->GetDecomposition()->GetMyParticles();
 
     this->b1Owner = this->worldRank;
-
-    this->numShifts = 0;
-
-    uint64_t numBufferInteractions = 0;
-    uint64_t numParticleInteractionsAcc = 0;
 
     // special case for 1 processor
     if (worldSize == 1) {
@@ -274,7 +264,7 @@ std::tuple<uint64_t, uint64_t> EAUTA::SimulationStep(ForceType forceType) {
             CalculatePairwiseInteractions(b1, b1, b1Owner, b1Owner);
         }
         this->simulation->GetDecomposition()->SetMyParticles(this->b1);
-        return std::tuple(numBufferInteractions, numParticleInteractionsAcc);
+        return;
     }
 
     // special case for 2 processors
@@ -300,7 +290,7 @@ std::tuple<uint64_t, uint64_t> EAUTA::SimulationStep(ForceType forceType) {
 
         simulation->GetDecomposition()->SetMyParticles(this->b1);
 
-        return std::tuple(numBufferInteractions, numParticleInteractionsAcc);
+        return;
     }
 
     // special case for 3 processors
@@ -332,7 +322,7 @@ std::tuple<uint64_t, uint64_t> EAUTA::SimulationStep(ForceType forceType) {
         SumUpParticles(this->b0, this->b1, this->b2);
         simulation->GetDecomposition()->SetMyParticles(this->b0);
 
-        return std::tuple(numBufferInteractions, numParticleInteractionsAcc);
+        return;
     }
 
     // use assignment operator to copy vector
@@ -419,7 +409,7 @@ std::tuple<uint64_t, uint64_t> EAUTA::SimulationStep(ForceType forceType) {
                 // sum up particles
                 this->SumUpParticles(this->b0, this->b1, this->b2);
                 this->simulation->GetDecomposition()->SetMyParticles(this->b0);
-                return std::tuple(numBufferInteractions, numParticleInteractionsAcc);
+                return;
             }
         }
         i = (i + 1) % 3;
@@ -442,5 +432,5 @@ std::tuple<uint64_t, uint64_t> EAUTA::SimulationStep(ForceType forceType) {
 
     this->simulation->GetDecomposition()->SetMyParticles(this->b0);
 
-    return std::tuple(numBufferInteractions, numParticleInteractionsAcc);
+    return;
 }
