@@ -27,29 +27,20 @@ std::tuple<uint64_t, uint64_t> Algorithm::CalculateInteractions(std::vector<Util
                                                                 std::vector<Utility::Particle> &b1,
                                                                 std::vector<Utility::Particle> &b2, int b0Owner,
                                                                 int b1Owner, int b2Owner) {
-    return calculateInteractions(b0, b1, b2, b0Owner, b1Owner, b2Owner, 0, -1, -1, Eigen::Array3d(-1));
+    return calculateInteractions(b0, b1, b2, b0Owner, b1Owner, b2Owner, 0, -1);
 }
 
 std::tuple<uint64_t, uint64_t> Algorithm::CalculateInteractions(std::vector<Utility::Particle> &b0,
                                                                 std::vector<Utility::Particle> &b1,
                                                                 std::vector<Utility::Particle> &b2, int b0Owner,
                                                                 int b1Owner, int b2Owner, int b0Start, int b0NumSteps) {
-    return calculateInteractions(b0, b1, b2, b0Owner, b1Owner, b2Owner, b0Start, b0NumSteps, -1, Eigen::Array3d(-1));
-}
-
-std::tuple<uint64_t, uint64_t> Algorithm::CalculateInteractions(std::vector<Utility::Particle> &b0,
-                                                                std::vector<Utility::Particle> &b1,
-                                                                std::vector<Utility::Particle> &b2, int b0Owner,
-                                                                int b1Owner, int b2Owner, double cutoff,
-                                                                Eigen::Array3d physicalDomainSize) {
-    return calculateInteractions(b0, b1, b2, b0Owner, b1Owner, b2Owner, 0, -1, cutoff, physicalDomainSize);
+    return calculateInteractions(b0, b1, b2, b0Owner, b1Owner, b2Owner, b0Start, b0NumSteps);
 }
 
 std::tuple<uint64_t, uint64_t> Algorithm::calculateInteractions(std::vector<Utility::Particle> &b0,
                                                                 std::vector<Utility::Particle> &b1,
                                                                 std::vector<Utility::Particle> &b2, int b0Owner,
-                                                                int b1Owner, int b2Owner, int b0Start, int b0NumSteps,
-                                                                double cutoff, Eigen::Array3d physicalDomainSize) {
+                                                                int b1Owner, int b2Owner, int b0Start, int b0NumSteps) {
 #ifdef PROFILE_3BMDA
     this->calcForcesAcc = 0;
     // bool append = false;
@@ -59,7 +50,6 @@ std::tuple<uint64_t, uint64_t> Algorithm::calculateInteractions(std::vector<Util
 #endif
     uint64_t numActParticleInteractions = 0;
     uint64_t numPossibleParticleInteractions = 0;
-    double sqrCutoff = cutoff * cutoff;
     for (size_t i = b0Start; i < (b0NumSteps != -1 ? (size_t)(b0Start + b0NumSteps) : b0.size()); ++i) {
         if (b0[i].isDummy) {
             continue;
@@ -80,14 +70,6 @@ std::tuple<uint64_t, uint64_t> Algorithm::calculateInteractions(std::vector<Util
                     continue;
                 }
                 numPossibleParticleInteractions++;
-                // only calculate if this triplet is inside the cutoff
-                // if (cutoff > 0) {
-                //     if (b0[i].GetSqrDistPeriodic(b1[j], physicalDomainSize) > sqrCutoff ||
-                //         b0[i].GetSqrDistPeriodic(b2[k], physicalDomainSize) > sqrCutoff ||
-                //         b1[j].GetSqrDistPeriodic(b2[k], physicalDomainSize) > sqrCutoff) {
-                //         continue;
-                //     }
-                // }
 
 #ifdef PROFILE_3BMDA
                 std::chrono::time_point<std::chrono::system_clock> start1;
@@ -104,9 +86,6 @@ std::tuple<uint64_t, uint64_t> Algorithm::calculateInteractions(std::vector<Util
             }
         }
     }
-//    }
-//    #pragma omp taskwait
-//}
 #ifdef PROFILE_3BMDA
     end = std::chrono::system_clock::now();
     auto elapsed_time = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
@@ -227,15 +206,14 @@ void Algorithm::SumUpParticles(std::vector<Utility::Particle> &b0, std::vector<U
 std::tuple<uint64_t, uint64_t> Algorithm::CalculatePairwiseInteractions(std::vector<Utility::Particle> &b0,
                                                                         std::vector<Utility::Particle> &b1, int b0Owner,
                                                                         int b1Owner) {
-    return calculatePairwiseInteractions(b0, b1, b0Owner, b1Owner, 0, -1, -1, Eigen::Array3d(-1));
+    return calculatePairwiseInteractions(b0, b1, b0Owner, b1Owner, 0, -1);
 }
 
-std::tuple<uint64_t, uint64_t> Algorithm::calculatePairwiseInteractions(
-    std::vector<Utility::Particle> &b0, std::vector<Utility::Particle> &b1, int b0Owner, int b1Owner, int b0Start,
-    int b0NumSteps, [[maybe_unused]] double cutoff, [[maybe_unused]] Eigen::Array3d physicalDomainSize) {
+std::tuple<uint64_t, uint64_t> Algorithm::calculatePairwiseInteractions(std::vector<Utility::Particle> &b0,
+                                                                        std::vector<Utility::Particle> &b1, int b0Owner,
+                                                                        int b1Owner, int b0Start, int b0NumSteps) {
     uint64_t numActParticleInteractions = 0;
     uint64_t numPossibleParticleInteractions = 0;
-    // double sqrCutoff = cutoff * cutoff;
     for (size_t i = b0Start; i < (b0NumSteps != -1 ? (size_t)(b0Start + b0NumSteps) : b0.size()); ++i) {
         if (b0[i].isDummy) {
             continue;

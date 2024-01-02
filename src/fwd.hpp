@@ -6,18 +6,13 @@ class Simulation;
 class Topology;
 
 // algorithms
-class NATA;
-class P3BCA;
-class AUTA;
 class EAUTA;
 
 // decompositions
 class AtomDecomposition;
-class RegularGridDecomposition;
 
 // topologies
 class RingTopology;
-class CartTopology;
 
 // potentials
 class Potential;

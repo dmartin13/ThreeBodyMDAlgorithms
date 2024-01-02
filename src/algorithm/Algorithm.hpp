@@ -42,13 +42,11 @@ protected:
     std::tuple<uint64_t, uint64_t> calculateInteractions(std::vector<Utility::Particle> &b0,
                                                          std::vector<Utility::Particle> &b1,
                                                          std::vector<Utility::Particle> &b2, int b0Owner, int b1Owner,
-                                                         int b2Owner, int b0Start, int b0NumSteps, double cutoff,
-                                                         Eigen::Array3d physicalDomainSize);
+                                                         int b2Owner, int b0Start, int b0NumSteps);
 
     std::tuple<uint64_t, uint64_t> calculatePairwiseInteractions(std::vector<Utility::Particle> &b0,
                                                                  std::vector<Utility::Particle> &b1, int b0Owner,
-                                                                 int b1Owner, int b0Start, int b0NumSteps,
-                                                                 double cutoff, Eigen::Array3d physicalDomainSize);
+                                                                 int b1Owner, int b0Start, int b0NumSteps);
 #ifdef PROFILE_3BMDA
     void calcParticleInteractions(std::vector<std::tuple<int, int, int>> &particleTripletsToCalculate,
                                   std::vector<Utility::Particle> &b0, std::vector<Utility::Particle> &b1,
@@ -75,10 +73,6 @@ public:
                                                          std::vector<Utility::Particle> &b1,
                                                          std::vector<Utility::Particle> &b2, int b0Owner, int b1Owner,
                                                          int b2Owner, int b0Start, int b0NumSteps);
-    std::tuple<uint64_t, uint64_t> CalculateInteractions(std::vector<Utility::Particle> &b0,
-                                                         std::vector<Utility::Particle> &b1,
-                                                         std::vector<Utility::Particle> &b2, int b0Owner, int b1Owner,
-                                                         int b2Owner, double cutoff, Eigen::Array3d physicalDomainSize);
 
     std::tuple<uint64_t, uint64_t> CalculatePairwiseInteractions(std::vector<Utility::Particle> &b0,
                                                                  std::vector<Utility::Particle> &b1, int b0Owner,

@@ -6,7 +6,7 @@ namespace Utility {
         std::cout << "Help: \n"
                   << "Options:\n"
                   << "\t-h,--help\t\tShow this help message\n"
-                  << "\t-a,--algorithm\t\talgorithm to use (\"nata\", \"p3bca\", \"auta\", \"eauta\")\n"
+                  << "\t-a,--algorithm\t\talgorithm to use (\"eauta\")\n"
                   << "\t-i,--iterations\t\tnum of iterations to simulate\n"
                   << "\t-r,--respaStepSize\tr-RESPA Step Size\n"
                   << "\t-tI,--thermostatInterval\tThermostat Interval\n"
@@ -104,13 +104,7 @@ namespace Utility {
                             exit(1);
                         }
                         value = args[i + 1];
-                        if (value.compare("nata") == 0) {
-                            a.algorithm = AlgorithmType::NATAType;
-                        } else if (value.compare("p3bca") == 0) {
-                            a.algorithm = AlgorithmType::P3BCAType;
-                        } else if (value.compare("auta") == 0) {
-                            a.algorithm = AlgorithmType::AUTAType;
-                        } else if (value.compare("eauta") == 0) {
+                        if (value.compare("eauta") == 0) {
                             a.algorithm = AlgorithmType::EAUTAType;
                         } else {
                             a.printHelp();

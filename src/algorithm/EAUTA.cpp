@@ -141,8 +141,7 @@ std::tuple<uint64_t, uint64_t> EAUTA::calculateOneHalfOfInteractions(std::vector
         numSteps = b0Sorted->size() - numSteps;
     }
 
-    return this->calculatePairwiseInteractions(*b0Sorted, *b1Sorted, b0OwnerSorted, b1OwnerSorted, start, numSteps, 0,
-                                               Eigen::Array3d{0, 0, 0});
+    return this->calculatePairwiseInteractions(*b0Sorted, *b1Sorted, b0OwnerSorted, b1OwnerSorted, start, numSteps);
 }
 
 std::vector<Utility::Particle>* EAUTA::pickBuffer(int i) {
