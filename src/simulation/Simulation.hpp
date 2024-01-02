@@ -19,7 +19,6 @@ private:
     size_t respaStepSize;
     std::shared_ptr<Algorithm> algorithm;
     std::shared_ptr<Topology> topology;
-    // std::shared_ptr<Potential> potential;
     std::shared_ptr<PairwisePotential> pairwisepotential;
     std::shared_ptr<TriwisePotential> triwisepotential;
     std::shared_ptr<DomainDecomposition> decomposition;
@@ -50,7 +49,6 @@ public:
 
     std::shared_ptr<Algorithm> GetAlgorithm();
     std::shared_ptr<Topology> GetTopology();
-    // std::shared_ptr<Potential> GetPotential();
     std::shared_ptr<PairwisePotential> GetPairwisePotential();
     std::shared_ptr<TriwisePotential> GetTriwisePotential();
     std::shared_ptr<DomainDecomposition> GetDecomposition();

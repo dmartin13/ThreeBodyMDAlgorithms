@@ -24,7 +24,4 @@ namespace Utility {
 
     std::string get_file_contents(const char *filename);
 
-    std::vector<int> getDecomposition(int worldSize,
-                                      const std::vector<std::pair<int, std::vector<int>>> &decompositions);
-
 }  // namespace Utility

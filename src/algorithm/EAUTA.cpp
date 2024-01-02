@@ -351,10 +351,6 @@ std::tuple<uint64_t, uint64_t> EAUTA::SimulationStep(ForceType forceType) {
     size_t numStepsPairwise = Utility::BinomialCoefficient(worldSize + 2 - 1, 2) / worldSize;
     size_t pairCounter = 0;
 
-#ifdef TESTS_3BMDA
-    processed.clear();
-#endif
-
     for (int s = this->worldSize - 3; s > 0; s -= 3) {
         for (int j = 0; j < s; ++j) {
             if (j != 0 || s != this->worldSize - 3) {
@@ -425,10 +421,6 @@ std::tuple<uint64_t, uint64_t> EAUTA::SimulationStep(ForceType forceType) {
                 this->simulation->GetDecomposition()->SetMyParticles(this->b0);
                 return std::tuple(numBufferInteractions, numParticleInteractionsAcc);
             }
-
-#ifdef TESTS_3BMDA
-            processed.push_back(Utility::Triplet(this->b0Owner, this->b1Owner, this->b2Owner));
-#endif
         }
         i = (i + 1) % 3;
         bi = pickBuffer(i);
@@ -440,11 +432,6 @@ std::tuple<uint64_t, uint64_t> EAUTA::SimulationStep(ForceType forceType) {
 
         // Calculate one third of the interactions between b0, b1, b2
         calculateOneThirdOfInteractions(thirdID);
-
-#ifdef TESTS_3BMDA
-        // TESTS_3BMDA is defined
-        processed.push_back(Utility::Triplet(getBufOwner(0), getBufOwner(1), getBufOwner(2)));
-#endif
     }
 
     // send back to owner

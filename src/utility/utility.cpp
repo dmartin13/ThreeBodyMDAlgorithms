@@ -82,16 +82,4 @@ namespace Utility {
         return contents.str();
     }
 
-    std::vector<int> getDecomposition(int worldSize,
-                                      const std::vector<std::pair<int, std::vector<int>>> &decompositions) {
-        std::vector<int> result;
-        for (std::pair<int, std::vector<int>> e : decompositions) {
-            if (e.first == worldSize) {
-                result = e.second;
-                break;
-            }
-        }
-        return result;
-    }
-
 }  // namespace Utility
