@@ -52,17 +52,17 @@ void AxilrodTeller::CalculateForces(Utility::Particle &i, Utility::Particle &j, 
     double dVdRa, dVdRb, dVdRc;
 
     // this is the gradient of the axilrodteller potential
-    dVdRa = (3. * this->nu / (8. * d1a)) *
+    dVdRa = (3. * nu / (8. * d1a)) *
             (-8. / (d4a * d3b * d3c) - 1. / (d5b * d5c) + 5. * d1b / (d6a * d5c) + 5. * d1c / (d6a * d5b) -
              1. / (d2a * d3b * d5c) - 1. / (d2a * d5b * d3c) - 3. / (d4a * d1b * d5c) - 3. / (d4a * d5b * d1c) -
              5. / (d6a * d1b * d3c) - 5. / (d6a * d3b * d1c) + 6. / (d4a * d3b * d3c));
 
-    dVdRb = (3. * this->nu / (8. * d1b)) *
+    dVdRb = (3. * nu / (8. * d1b)) *
             (-8. / (d4b * d3a * d3c) - 1. / (d5a * d5c) + 5. * d1a / (d6b * d5c) + 5. * d1c / (d6b * d5a) -
              1. / (d2b * d3a * d5c) - 1. / (d2b * d5a * d3c) - 3. / (d4b * d1a * d5c) - 3. / (d4b * d5a * d1c) -
              5. / (d6b * d1a * d3c) - 5. / (d6b * d3a * d1c) + 6. / (d4b * d3a * d3c));
 
-    dVdRc = (3. * this->nu / (8. * d1c)) *
+    dVdRc = (3. * nu / (8. * d1c)) *
             (-8. / (d4c * d3b * d3a) - 1. / (d5b * d5a) + 5. * d1b / (d6c * d5a) + 5. * d1a / (d6c * d5b) -
              1. / (d2c * d3b * d5a) - 1. / (d2c * d5b * d3a) - 3. / (d4c * d1b * d5a) - 3. / (d4c * d5b * d1a) -
              5. / (d6c * d1b * d3a) - 5. / (d6c * d3b * d1a) + 6. / (d4c * d3b * d3a));

@@ -15,9 +15,9 @@ public:
         return _instance;
     }
     void StoreMessage(int rank, std::string message) {
-        this->messages.push_back("Message from processor: " + std::to_string(rank) + ": " + message);
+        messages.push_back("Message from processor: " + std::to_string(rank) + ": " + message);
     };
-    std::vector<std::string> GetAllMessages() { return this->messages; };
+    std::vector<std::string> GetAllMessages() { return messages; };
 
 private:
     std::vector<std::string> messages;

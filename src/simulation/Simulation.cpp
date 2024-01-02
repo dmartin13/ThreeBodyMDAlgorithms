@@ -64,7 +64,7 @@ void Simulation::Start() {
             MPI_Barrier(this->topology->GetComm());
 
             // execute algorithm... force calculation
-            numInteractions.push_back(this->algorithm->SimulationStep(forceTypeToCalculate));
+            this->algorithm->SimulationStep(forceTypeToCalculate);
             MPI_Barrier(this->topology->GetComm());
 
             // update the velocities
