@@ -30,7 +30,12 @@ private:
     std::vector<std::tuple<uint64_t, uint64_t>> numInteractions;
     std::string csvOutput;
 
+    std::vector<double> kineticEnergy;
+    std::vector<double> potentialEnergy;
+    std::vector<double> totalEnergy;
+
     void writeSimulationStepToCSV(std::string file);
+    double calculateKineticEnergy();
 
 public:
     Simulation(Utility::cliArguments& args, int iterations, int respaStepSize, std::shared_ptr<Algorithm> algorithm,

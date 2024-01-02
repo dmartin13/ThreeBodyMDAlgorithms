@@ -6,7 +6,7 @@ LennardJones::LennardJones(double epsilon, double sigma)
 void LennardJones::CalculateForces(Utility::Particle &i, Utility::Particle &j) {
     auto sigmaSquared = _sigmaSquared;
     auto epsilon24 = _epsilon24;
-    Eigen::Vector3d dr = i.GetR() - j.GetR();
+    Eigen::Array3d dr = i.GetR() - j.GetR();
     double dr2 = dr.cwiseProduct(dr).sum();
 
     double invdr2 = 1. / dr2;
@@ -25,4 +25,8 @@ void LennardJones::CalculateForces(Utility::Particle &i, Utility::Particle &j) {
     j.f0X -= f.x();
     j.f0Y -= f.y();
     j.f0Z -= f.z();
+
+    // calculate potential energy and virial
+    potentialEnergy += 4.0 * _epsilon * lj12m6;
+    virial += dr * f;
 }

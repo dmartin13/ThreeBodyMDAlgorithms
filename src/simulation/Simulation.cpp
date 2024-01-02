@@ -16,7 +16,6 @@ void Simulation::Init() {
     this->topology->Init(simulationPtr);
     this->decomposition->Init(simulationPtr);
     this->algorithm->Init(simulationPtr);
-    // this->potential->Init(simulationPtr);
     this->pairwisepotential->Init(simulationPtr);
     this->triwisepotential->Init(simulationPtr);
 }
@@ -72,10 +71,30 @@ void Simulation::Start() {
             decomposition->UpdateVelocities(dt, respaActive ? ForceType::TwoBody : ForceType::TwoAndThreeBody,
                                             respaStepSize);
 
-            if (args.useThermostat) {
-                if (i % args.thermostatInterval == 0) {
-                    Thermostat::apply(decomposition->GetMyParticles(), args.targetTemperature, args.deltaTemperature);
+            if (not respaActive) {
+                // apply thermostat
+                if (args.useThermostat) {
+                    if (i % (args.thermostatInterval) == 0) {
+                        Thermostat::apply(decomposition->GetMyParticles(), args.targetTemperature,
+                                          args.deltaTemperature);
+                    }
                 }
+
+                // calculate kinetic energy
+                const auto eKin = calculateKineticEnergy();
+                kineticEnergy.push_back(calculateKineticEnergy());
+
+                // get the potential energy
+                const auto uPot =
+                    pairwisepotential->GetAndResetPotentialEnergy() + triwisepotential->GetAndResetPotentialEnergy();
+                potentialEnergy.push_back(uPot);
+
+                // total energy
+                totalEnergy.push_back(eKin + uPot);
+
+            } else if (not nextIsRespaIteration) {
+                pairwisepotential->GetAndResetPotentialEnergy();
+                triwisepotential->GetAndResetPotentialEnergy();
             }
 
             MPI_Barrier(this->topology->GetComm());
@@ -86,7 +105,30 @@ void Simulation::Start() {
             // 3-body force has already bee calculated in inner loop
             // update velocities using three body force
             decomposition->UpdateVelocities(dt, ForceType::ThreeBody, respaStepSize);
+
+            // apply thermostat
+            if (args.useThermostat) {
+                if (i % (args.thermostatInterval * respaStepSize) == 0) {
+                    Thermostat::apply(decomposition->GetMyParticles(), args.targetTemperature, args.deltaTemperature);
+                }
+            }
+
+            // calculate kinetic energy
+            const auto eKin = calculateKineticEnergy();
+            kineticEnergy.push_back(calculateKineticEnergy());
+
+            // get the potential energy
+            const auto uPot =
+                pairwisepotential->GetAndResetPotentialEnergy() + triwisepotential->GetAndResetPotentialEnergy();
+            potentialEnergy.push_back(uPot);
+
+            // total energy
+            totalEnergy.push_back(eKin + uPot);
         }
+
+        // reset virial
+        pairwisepotential->GetAndResetVirial();
+        triwisepotential->GetAndResetVirial();
 
 #ifdef MEASURESIMSTEP_3BMDA
         end = std::chrono::system_clock::now();
@@ -121,18 +163,34 @@ void Simulation::Start() {
     }
 }
 
+double Simulation::calculateKineticEnergy() {
+    double kinEAcc = 0;
+    for (const auto& p : decomposition->GetMyParticles()) {
+        if (p.isDummy) {
+            continue;
+        }
+        kinEAcc += p.mass * (p.vX * p.vX + p.vY * p.vY + p.vZ * p.vZ);
+    }
+    kinEAcc *= 0.5;
+    return kinEAcc;
+}
+
 MPI_Datatype* Simulation::GetMPIParticleType() { return this->mpiParticleType; }
 
 std::vector<Utility::Particle>& Simulation::GetAllParticles() { return this->particles; }
 
 double Simulation::GetDeltaT() { return this->dt; }
+
 int Simulation::GetNumIterations() { return this->iterations; }
+
 uint64_t Simulation::GetNumBufferInteractions(int step) {
     return (size_t)step < this->numInteractions.size() ? std::get<0>(this->numInteractions[step]) : 0;
 }
+
 uint64_t Simulation::GetNumParticleInteractions(int step) {
     return (size_t)step < this->numInteractions.size() ? std::get<1>(this->numInteractions[step]) : 0;
 }
+
 Eigen::Vector3d Simulation::GetGForce() { return this->gForce; }
 
 void Simulation::writeSimulationStepToCSV(std::string file) {
