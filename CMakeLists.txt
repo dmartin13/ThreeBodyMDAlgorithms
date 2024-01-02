@@ -45,13 +45,10 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   set(CMAKE_CXX_FLAGS_RELWITHDEBINFO " -pg -Og -march=native")
 endif(CMAKE_COMPILER_IS_GNUCXX)
 
-add_subdirectory(src)
-# add_subdirectory(tools)
-
-# TOOLS
+# Particle Generator
 file(GLOB_RECURSE TOOLS_SOURCES CONFIGURE_DEPENDS "tools/*.hpp" "tools/*.cpp")
 
-add_executable(particlegenerator particleToCSV.cpp ${TOOLS_SOURCES})
+add_executable(particlegenerator particlegenerator.cpp ${TOOLS_SOURCES})
 
 target_include_directories(particlegenerator PRIVATE tools)
 
@@ -61,18 +58,19 @@ set_target_properties(
 
 # MAINRESPA
 
-include_directories(SYSTEM ${MPI_INCLUDE_PATH})
-
 file(GLOB_RECURSE MAINRESPA_SOURCES CONFIGURE_DEPENDS "src/*.hpp" "src/*.cpp")
 
 add_executable(mainrespa mainrespa.cpp ${MAINRESPA_SOURCES})
+
 target_include_directories(mainrespa PRIVATE src)
+target_include_directories(mainrespa PRIVATE ${MPI_INCLUDE_PATH})
 
 target_link_libraries(mainrespa ${MPI_C_LIBRARIES})
 target_link_libraries(mainrespa Eigen3::Eigen)
 target_link_libraries(mainrespa OpenMP::OpenMP_CXX)
 
 if(PROFILE_3BMDA)
+message(STATUS "add PROFILE compile definition")
   target_compile_definitions(mainrespa PUBLIC PROFILE_3BMDA)
 endif()
 if(USE_OMP)
@@ -80,6 +78,7 @@ if(USE_OMP)
   target_compile_definitions(mainrespa PUBLIC USE_OMP)
 endif()
 if(MEASURESIMSTEP_3BMDA)
+message(STATUS "add MEASURESIMSTEP compile definition")
   target_compile_definitions(mainrespa PUBLIC MEASURESIMSTEP_3BMDA)
 endif()
 
@@ -110,6 +109,7 @@ if(TESTS_3BMDA)
 
   target_include_directories(tests PRIVATE src)
   target_include_directories(tests PRIVATE external/gtest/include)
+  target_include_directories(tests PRIVATE ${MPI_INCLUDE_PATH})
 
   target_link_libraries(tests gtest)
   target_link_libraries(tests ${MPI_C_LIBRARIES})
