@@ -44,9 +44,9 @@ namespace TimeIntegration {
             auto vY = p.vY * deltaT;
             auto vZ = p.vZ * deltaT;
 
-            fX *= (deltaT * deltaT / 2 * p.mass);
-            fY *= (deltaT * deltaT / 2 * p.mass);
-            fZ *= (deltaT * deltaT / 2 * p.mass);
+            fX *= (deltaT * deltaT / (2 * p.mass));
+            fY *= (deltaT * deltaT / (2 * p.mass));
+            fZ *= (deltaT * deltaT / (2 * p.mass));
 
             // calcuate displacement
             const auto displacementX = vX + fX;
