@@ -3,7 +3,7 @@ project(
   3BMDA
   VERSION 1.0
   LANGUAGES C CXX
-  DESCRIPTION "Three Body MD Algorithms")
+  DESCRIPTION "Multiple Timestepping for Two and Three Body Forces")
 
 # so we can see which compile flags are used by gcc
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -46,11 +46,11 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 endif(CMAKE_COMPILER_IS_GNUCXX)
 
 # Particle Generator
-file(GLOB_RECURSE TOOLS_SOURCES CONFIGURE_DEPENDS "tools/*.hpp" "tools/*.cpp")
+file(GLOB_RECURSE TOOLS_SOURCES CONFIGURE_DEPENDS "tools/particlegenerator/*.hpp" "tools/particlegenerator/*.cpp")
 
-add_executable(particlegenerator particlegenerator.cpp ${TOOLS_SOURCES})
+add_executable(particlegenerator tools/particlegenerator/particlegenerator.cpp ${TOOLS_SOURCES})
 
-target_include_directories(particlegenerator PRIVATE tools)
+target_include_directories(particlegenerator PRIVATE tools/particlegenerator)
 
 set_target_properties(
   particlegenerator PROPERTIES RUNTIME_OUTPUT_DIRECTORY
@@ -70,7 +70,7 @@ target_link_libraries(mainrespa Eigen3::Eigen)
 target_link_libraries(mainrespa OpenMP::OpenMP_CXX)
 
 if(PROFILE_3BMDA)
-message(STATUS "add PROFILE compile definition")
+  message(STATUS "add PROFILE compile definition")
   target_compile_definitions(mainrespa PUBLIC PROFILE_3BMDA)
 endif()
 if(USE_OMP)
@@ -78,12 +78,12 @@ if(USE_OMP)
   target_compile_definitions(mainrespa PUBLIC USE_OMP)
 endif()
 if(MEASURESIMSTEP_3BMDA)
-message(STATUS "add MEASURESIMSTEP compile definition")
+  message(STATUS "add MEASURESIMSTEP compile definition")
   target_compile_definitions(mainrespa PUBLIC MEASURESIMSTEP_3BMDA)
 endif()
 
 set_target_properties(mainrespa PROPERTIES RUNTIME_OUTPUT_DIRECTORY
-                                      ${CMAKE_BINARY_DIR}/executables)
+                                           ${CMAKE_BINARY_DIR}/executables)
 
 # TESTS
 
@@ -127,8 +127,7 @@ if(TESTS_3BMDA)
   # ${MPIEXEC_NUMPROC_FLAG} 1') gtest_discover_tests(tests TEST_PREFIX "tests/"
   # DISCOVERY_TIMEOUT 60)
 
-  set_target_properties(
-    tests PROPERTIES RUNTIME_OUTPUT_DIRECTORY
-                                ${CMAKE_BINARY_DIR}/executables/tests)
+  set_target_properties(tests PROPERTIES RUNTIME_OUTPUT_DIRECTORY
+                                         ${CMAKE_BINARY_DIR}/executables/tests)
 
 endif(TESTS_3BMDA)
