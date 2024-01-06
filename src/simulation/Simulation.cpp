@@ -45,25 +45,33 @@ void Simulation::Start() {
         const bool isRespaIteration = respaActive and (i % respaStepSize == 0);
         const bool nextIsRespaIteration = respaActive and ((i + 1) % respaStepSize == 0);
 
-        // determine the forceType to calculate in this iteration
-        auto forceTypeToCalculate = ForceType::TwoAndThreeBody;
-        if (respaActive and (not nextIsRespaIteration)) {
-            // if respa should be used but this is not a respa iteration then only calculate two body interactions
-            forceTypeToCalculate = ForceType::TwoBody;
-        }
-
         if (respaActive and isRespaIteration) {
+            // if this is the first iteration we nedd a force calculation here so we can update the velocities with the
+            // threebody force.
+            if (i == 0) {
+                this->algorithm->SimulationStep(ForceType::ThreeBody);
+                MPI_Barrier(this->topology->GetComm());
+            }
             // update velocities with three body force
             decomposition->UpdateVelocities(dt, ForceType::ThreeBody, respaStepSize);
         }
 
-        // the following part is the inner loop of the respa algorithm
+        // the following part is the inner loop of the respa algorithm. If respa is not used, this corresponds to the
+        // störmer verlet integration
         {
             // update particle positions using the two-body force
             decomposition->UpdatePositions(dt, gForce, respaActive ? ForceType::TwoBody : ForceType::TwoAndThreeBody);
             MPI_Barrier(this->topology->GetComm());
 
             // execute algorithm... force calculation
+            // determine the forceType to calculate in this iteration
+            auto forceTypeToCalculate = ForceType::TwoAndThreeBody;
+            if (respaActive and (not nextIsRespaIteration)) {
+                // if respa should be used but the next iteration is not a respa iteration then only calculate two body
+                // interactions
+                forceTypeToCalculate = ForceType::TwoBody;
+            }
+
             this->algorithm->SimulationStep(forceTypeToCalculate);
             MPI_Barrier(this->topology->GetComm());
 
