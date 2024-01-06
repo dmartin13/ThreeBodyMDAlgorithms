@@ -18,6 +18,9 @@ namespace Utility {
                   << "\t-gx,--gravityZ\t\tgravitational force in x-direction\n"
                   << "\t-gy,--gravityY\t\tgravitational force in y-direction\n"
                   << "\t-gz,--gravityZ\t\tgravitational force in z-direction\n"
+                  << "\t-s,--sigma\t\tsigma for LJ potential\n"
+                  << "\t-e,--epsilon\t\tepsilon for LJ potential\n"
+                  << "\t-nu,--nu\t\tparameter for ATM potential\n"
                   << "\t-csv,--csv\t\tcsv file with particles\n"
                   << "\t-o,--out\t\tcsv base file name that will be used to create all csv outputs from each "
                      "simulation step\n"
@@ -191,6 +194,33 @@ namespace Utility {
                         }
                         value = args[i + 1];
                         a.gForce[2] = std::stod(value);
+
+                        i += 1;
+                    } else if (flag.compare("s") == 0 || flag.compare("-sigma") == 0) {
+                        if (args.size() <= (size_t)(i + 1)) {
+                            a.printHelp();
+                            exit(1);
+                        }
+                        value = args[i + 1];
+                        a.sigma = std::stod(value);
+
+                        i += 1;
+                    } else if (flag.compare("e") == 0 || flag.compare("-epsilon") == 0) {
+                        if (args.size() <= (size_t)(i + 1)) {
+                            a.printHelp();
+                            exit(1);
+                        }
+                        value = args[i + 1];
+                        a.epsilon = std::stod(value);
+
+                        i += 1;
+                    } else if (flag.compare("nu") == 0 || flag.compare("-nu") == 0) {
+                        if (args.size() <= (size_t)(i + 1)) {
+                            a.printHelp();
+                            exit(1);
+                        }
+                        value = args[i + 1];
+                        a.nu = std::stod(value);
 
                         i += 1;
                     } else {

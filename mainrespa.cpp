@@ -27,9 +27,9 @@ std::shared_ptr<Simulation> createContext() {
     // domain decomposition
     std::shared_ptr<AtomDecomposition> atomDecomposition = std::make_shared<AtomDecomposition>();
 
-    // create potential... TODO: pass correct parameters epsilon, sigma, nu
-    std::shared_ptr<LennardJones> lj = std::make_shared<LennardJones>(1.0, 1.0);
-    std::shared_ptr<AxilrodTeller> axilrodTeller = std::make_shared<AxilrodTeller>(1.0);
+    // create potential
+    std::shared_ptr<LennardJones> lj = std::make_shared<LennardJones>(a.epsilon, a.sigma);
+    std::shared_ptr<AxilrodTeller> axilrodTeller = std::make_shared<AxilrodTeller>(a.nu);
 
     // create algorithm
     std::shared_ptr<EAUTA> eauta = std::make_shared<EAUTA>();

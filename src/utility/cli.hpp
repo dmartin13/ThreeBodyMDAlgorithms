@@ -29,6 +29,11 @@ namespace Utility {
         double targetTemperature;
         double deltaTemperature;
 
+        // parameters for potentials
+        double epsilon;
+        double sigma;
+        double nu;
+
         void printHelp();
     };
 
