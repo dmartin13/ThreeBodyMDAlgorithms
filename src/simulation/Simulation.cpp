@@ -36,6 +36,14 @@ void Simulation::Start() {
     const bool respaActive = respaStepSize > 0;
 
     for (int i = 0; i < iterations; ++i) {
+        // write simulation step
+#if !defined(BENCHMARK_3BMDA) && !defined(TESTS_3BMDA) && !defined(PROFILE_3BMDA)
+        if (this->csvOutput.compare("") != 0) {
+            writeSimulationStepToCSV(this->csvOutput.substr(0, this->csvOutput.find_last_of('.')) + "_" +
+                                     std::to_string(i) + ".csv");
+        }
+#endif
+
 #ifdef MEASURESIMSTEP_3BMDA
         std::chrono::time_point<std::chrono::system_clock> start;
         std::chrono::time_point<std::chrono::system_clock> end;
@@ -161,14 +169,15 @@ void Simulation::Start() {
         }
 
 #endif
-
-#if !defined(BENCHMARK_3BMDA) && !defined(TESTS_3BMDA) && !defined(PROFILE_3BMDA)
-        if (this->csvOutput.compare("") != 0) {
-            writeSimulationStepToCSV(this->csvOutput.substr(0, this->csvOutput.find_last_of('.')) + "_" +
-                                     std::to_string(i) + ".csv");
-        }
-#endif
     }
+
+    // Record last state of simulation.
+#if !defined(BENCHMARK_3BMDA) && !defined(TESTS_3BMDA) && !defined(PROFILE_3BMDA)
+    if (this->csvOutput.compare("") != 0) {
+        writeSimulationStepToCSV(this->csvOutput.substr(0, this->csvOutput.find_last_of('.')) + "_" +
+                                 std::to_string(iterations) + ".csv");
+    }
+#endif
 }
 
 double Simulation::calculateKineticEnergy() {
