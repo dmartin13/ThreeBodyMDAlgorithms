@@ -181,9 +181,9 @@ int main(int argc, char* argv[]) {
     // print messages
     gatherAndPrintMessages();
 
-    if (worldRank == 0) {
-        forceCalcTest();
-    }
+    // if (worldRank == 0) {
+    //     forceCalcTest();
+    // }
 
     // finalize
     MPI_Type_free(&mpiParticleType);

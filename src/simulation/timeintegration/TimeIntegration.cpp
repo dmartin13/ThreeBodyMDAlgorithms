@@ -69,6 +69,8 @@ namespace TimeIntegration {
                 const auto fY = p.f0Y + p.f1Y;
                 const auto fZ = p.f0Z + p.f1Z;
 
+                // Is this correct or do we need p.oldF0X + p.oldF1X here? -> Is correct since for non respa simulations
+                // we write both p.f0X + p.f1X into p.oldF0X. See calculatePositionsAndResetForces above
                 const auto oldForceX = p.oldF0X;
                 const auto oldForceY = p.oldF0Y;
                 const auto oldForceZ = p.oldF0Z;
