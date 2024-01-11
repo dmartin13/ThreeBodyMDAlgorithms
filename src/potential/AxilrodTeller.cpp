@@ -60,7 +60,7 @@ void AxilrodTeller::CalculateForces(Utility::Particle &i, Utility::Particle &j, 
 
     // Virial is calculated as f_i * r_i
     // see Thompson et al.: https://doi.org/10.1063/1.3245303
-    virial += (Eigen::Array3d{forceI[0], forceI[2], forceI[2]} * i.GetR() +
-               Eigen::Array3d{forceJ[0], forceJ[2], forceJ[2]} * j.GetR() +
-               Eigen::Array3d{forceK[0], forceK[2], forceK[2]} * k.GetR());
+    virial += (Eigen::Array3d{forceI[0], forceI[1], forceI[2]} * i.GetR() +
+               Eigen::Array3d{forceJ[0], forceJ[1], forceJ[2]} * j.GetR() +
+               Eigen::Array3d{forceK[0], forceK[1], forceK[2]} * k.GetR());
 }
