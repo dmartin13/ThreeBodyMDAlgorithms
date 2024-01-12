@@ -29,8 +29,13 @@ std::shared_ptr<TriwisePotential> Simulation::GetTriwisePotential() { return thi
 std::shared_ptr<DomainDecomposition> Simulation::GetDecomposition() { return this->decomposition; }
 
 void Simulation::Start() {
-    if (args.addBrownianMotion) {
-        Thermostat::addBrownianMotion(decomposition->GetMyParticles(), args.targetTemperature);
+    if (args.useThermostat and dt != 0) {
+        if (args.addBrownianMotion) {
+            Thermostat::addBrownianMotion(decomposition->GetMyParticles(), args.targetTemperature);
+        }
+
+        // Set the simulation directly to the desired initial temperature.
+        Thermostat::apply(decomposition->GetMyParticles(), args.initialTemperature, std::numeric_limits<double>::max());
     }
 
     const bool respaActive = respaStepSize > 0;
