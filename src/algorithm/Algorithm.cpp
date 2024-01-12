@@ -13,12 +13,12 @@ void Algorithm::Init(std::shared_ptr<Simulation> simulation) {
     this->worldRank = this->simulation->GetTopology()->GetWorldRank();
 }
 
-void Algorithm::CalculateInteractions(std::vector<Utility::Particle> &b0, std::vector<Utility::Particle> &b1,
+void Algorithm::CalculateTriwiseInteractions(std::vector<Utility::Particle> &b0, std::vector<Utility::Particle> &b1,
                                       std::vector<Utility::Particle> &b2, int b0Owner, int b1Owner, int b2Owner) {
     calculateTriwiseInteractions(b0, b1, b2, b0Owner, b1Owner, b2Owner, 0, -1);
 }
 
-void Algorithm::CalculateInteractions(std::vector<Utility::Particle> &b0, std::vector<Utility::Particle> &b1,
+void Algorithm::CalculateTriwiseInteractions(std::vector<Utility::Particle> &b0, std::vector<Utility::Particle> &b1,
                                       std::vector<Utility::Particle> &b2, int b0Owner, int b1Owner, int b2Owner,
                                       int b0Start, int b0NumSteps) {
     calculateTriwiseInteractions(b0, b1, b2, b0Owner, b1Owner, b2Owner, b0Start, b0NumSteps);

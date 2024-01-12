@@ -39,9 +39,9 @@ public:
 
     virtual void SimulationStep(ForceType forceType) = 0;
 
-    void CalculateInteractions(std::vector<Utility::Particle> &b0, std::vector<Utility::Particle> &b1,
+    void CalculateTriwiseInteractions(std::vector<Utility::Particle> &b0, std::vector<Utility::Particle> &b1,
                                std::vector<Utility::Particle> &b2, int b0Owner, int b1Owner, int b2Owner);
-    void CalculateInteractions(std::vector<Utility::Particle> &b0, std::vector<Utility::Particle> &b1,
+    void CalculateTriwiseInteractions(std::vector<Utility::Particle> &b0, std::vector<Utility::Particle> &b1,
                                std::vector<Utility::Particle> &b2, int b0Owner, int b1Owner, int b2Owner, int b0Start,
                                int b0NumSteps);
 

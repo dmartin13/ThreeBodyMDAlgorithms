@@ -104,7 +104,7 @@ void EAUTA::calculateOneThirdOfInteractions(int thirdID) {
         numSteps = b0Sorted->size() - 2 * numSteps;
     }
 
-    this->CalculateInteractions(*b0Sorted, *b1Sorted, *b2Sorted, b0OwnerSorted, b1OwnerSorted, b2OwnerSorted, start,
+    this->CalculateTriwiseInteractions(*b0Sorted, *b1Sorted, *b2Sorted, b0OwnerSorted, b1OwnerSorted, b2OwnerSorted, start,
                                 numSteps);
 }
 
@@ -258,7 +258,7 @@ void EAUTA::SimulationStep(ForceType forceType) {
     // special case for 1 processor
     if (worldSize == 1) {
         if (forceType == ForceType::ThreeBody or forceType == ForceType::TwoAndThreeBody) {
-            CalculateInteractions(this->b1, this->b1, this->b1, this->b1Owner, this->b1Owner, this->b1Owner);
+            CalculateTriwiseInteractions(this->b1, this->b1, this->b1, this->b1Owner, this->b1Owner, this->b1Owner);
         }
         if (forceType == ForceType::TwoBody or forceType == ForceType::TwoAndThreeBody) {
             CalculatePairwiseInteractions(b1, b1, b1Owner, b1Owner);
@@ -274,8 +274,8 @@ void EAUTA::SimulationStep(ForceType forceType) {
         this->b2Owner = shiftLeft(b2, worldRank);
 
         if (forceType == ForceType::ThreeBody or forceType == ForceType::TwoAndThreeBody) {
-            CalculateInteractions(this->b1, this->b1, this->b1, this->b1Owner, this->b1Owner, this->b1Owner);
-            CalculateInteractions(this->b1, this->b1, this->b2, this->b1Owner, this->b1Owner, this->b2Owner);
+            CalculateTriwiseInteractions(this->b1, this->b1, this->b1, this->b1Owner, this->b1Owner, this->b1Owner);
+            CalculateTriwiseInteractions(this->b1, this->b1, this->b2, this->b1Owner, this->b1Owner, this->b2Owner);
         }
         if (forceType == ForceType::TwoBody or forceType == ForceType::TwoAndThreeBody) {
             CalculatePairwiseInteractions(b1, b1, b1Owner, b1Owner);
@@ -302,9 +302,9 @@ void EAUTA::SimulationStep(ForceType forceType) {
         this->b2Owner = shiftLeft(b2, worldRank);
 
         if (forceType == ForceType::ThreeBody or forceType == ForceType::TwoAndThreeBody) {
-            CalculateInteractions(this->b1, this->b1, this->b1, this->b1Owner, this->b1Owner, this->b1Owner);
-            CalculateInteractions(this->b1, this->b1, this->b2, this->b1Owner, this->b1Owner, this->b2Owner);
-            CalculateInteractions(this->b0, this->b0, this->b2, this->b0Owner, this->b0Owner, this->b2Owner);
+            CalculateTriwiseInteractions(this->b1, this->b1, this->b1, this->b1Owner, this->b1Owner, this->b1Owner);
+            CalculateTriwiseInteractions(this->b1, this->b1, this->b2, this->b1Owner, this->b1Owner, this->b2Owner);
+            CalculateTriwiseInteractions(this->b0, this->b0, this->b2, this->b0Owner, this->b0Owner, this->b2Owner);
 
             // special case
             int thirdID = this->worldRank / (this->worldSize / 3);
@@ -349,9 +349,9 @@ void EAUTA::SimulationStep(ForceType forceType) {
                 // in the very first step (substep 1 of phase 1) we incorporate some 3-body and 2-body interactions we
                 // can calculate from the buffers we already have
                 if (forceType == ForceType::ThreeBody or forceType == ForceType::TwoAndThreeBody) {
-                    CalculateInteractions(this->b1, this->b1, this->b1, this->b1Owner, this->b1Owner, this->b1Owner);
-                    CalculateInteractions(this->b1, this->b1, this->b2, this->b1Owner, this->b1Owner, this->b2Owner);
-                    CalculateInteractions(this->b0, this->b0, this->b2, this->b0Owner, this->b0Owner, this->b2Owner);
+                    CalculateTriwiseInteractions(this->b1, this->b1, this->b1, this->b1Owner, this->b1Owner, this->b1Owner);
+                    CalculateTriwiseInteractions(this->b1, this->b1, this->b2, this->b1Owner, this->b1Owner, this->b2Owner);
+                    CalculateTriwiseInteractions(this->b0, this->b0, this->b2, this->b0Owner, this->b0Owner, this->b2Owner);
                 }
 
                 if (forceType == ForceType::TwoBody or forceType == ForceType::TwoAndThreeBody) {
@@ -368,13 +368,13 @@ void EAUTA::SimulationStep(ForceType forceType) {
                 // See Embedded AUT Algorithm paper: In the first phase we incorporate also some additional 3-body
                 // calculations after buffer 0 is shifted
                 if (forceType == ForceType::ThreeBody or forceType == ForceType::TwoAndThreeBody) {
-                    CalculateInteractions(this->b0, this->b1, this->b1, this->b0Owner, this->b1Owner, this->b1Owner);
+                    CalculateTriwiseInteractions(this->b0, this->b1, this->b1, this->b0Owner, this->b1Owner, this->b1Owner);
                 }
             }
 
             // normal interactions between all three buffers
             if (forceType == ForceType::ThreeBody or forceType == ForceType::TwoAndThreeBody) {
-                CalculateInteractions(this->b0, this->b1, this->b2, this->b0Owner, this->b1Owner, this->b2Owner);
+                CalculateTriwiseInteractions(this->b0, this->b1, this->b2, this->b0Owner, this->b1Owner, this->b2Owner);
             }
 
             // calculate pair interactions until we have all necessary pairs (note: if the number of processors is
