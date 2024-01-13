@@ -12,6 +12,14 @@ Simulation::Simulation(Utility::cliArguments& args, int iterations, int respaSte
       mpiParticleType(mpiParticleType), particles(particles), dt(dt), gForce(gForce), csvOutput(csvOutput) {}
 
 void Simulation::Init() {
+    // if add brownian motion is true we add it here to all particles. This is a really easy way so that all particles
+    // always have the same random velocity regardless of num processors
+    if (args.useThermostat and dt != 0) {
+        if (args.addBrownianMotion) {
+            Thermostat::addBrownianMotion(particles, args.targetTemperature);
+        }
+    }
+
     std::shared_ptr<Simulation> simulationPtr = shared_from_this();
     this->topology->Init(simulationPtr);
     this->decomposition->Init(simulationPtr);
@@ -30,10 +38,6 @@ std::shared_ptr<DomainDecomposition> Simulation::GetDecomposition() { return thi
 
 void Simulation::Start() {
     if (args.useThermostat and dt != 0) {
-        if (args.addBrownianMotion) {
-            Thermostat::addBrownianMotion(decomposition->GetMyParticles(), args.targetTemperature);
-        }
-
         // Set the simulation directly to the desired initial temperature.
         Thermostat::apply(decomposition->GetMyParticles(), args.initialTemperature, std::numeric_limits<double>::max());
     }
