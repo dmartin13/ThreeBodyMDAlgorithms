@@ -63,4 +63,6 @@ void AxilrodTeller::CalculateForces(Utility::Particle &i, Utility::Particle &j, 
     virial += (Eigen::Array3d{forceI[0], forceI[1], forceI[2]} * i.GetR() +
                Eigen::Array3d{forceJ[0], forceJ[1], forceJ[2]} * j.GetR() +
                Eigen::Array3d{forceK[0], forceK[1], forceK[2]} * k.GetR());
+
+    perfomedInteractions++;
 }

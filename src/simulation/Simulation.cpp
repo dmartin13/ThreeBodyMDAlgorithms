@@ -174,6 +174,15 @@ void Simulation::Start() {
         }
 
 #endif
+
+        // print out some statistics of the simulation
+        if (this->GetTopology()->GetWorldRank() == 0) {
+            if ((not respaActive) or (respaActive and nextIsRespaIteration)) {
+                std::cout << "Finalized iteration " << i << "\n"
+                          << "Potential Energy           : " << std::format("{}", potentialEnergy.back()) << "\n"
+                          << "Kinetic Energy             : " << std::format("{}", kineticEnergy.back()) << std::endl;
+            }
+        }
     }
 
     // Record last state of simulation.

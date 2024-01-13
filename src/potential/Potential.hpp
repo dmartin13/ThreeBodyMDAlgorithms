@@ -14,10 +14,12 @@ protected:
     std::shared_ptr<Simulation> simulation;
     double potentialEnergy;
     Eigen::Array3d virial;
+    size_t perfomedInteractions{0};
 
 public:
     Potential();
     virtual void Init(std::shared_ptr<Simulation> simulation);
     double GetAndResetPotentialEnergy();
     Eigen::Array3d GetAndResetVirial();
+    size_t GetAndResetPerfomedInteractions();
 };

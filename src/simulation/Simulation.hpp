@@ -4,6 +4,8 @@
 #include <chrono>
 #endif
 
+#include <format>
+
 #include "Thermostat.hpp"
 #include "algorithm/Algorithm.hpp"
 #include "fwd.hpp"

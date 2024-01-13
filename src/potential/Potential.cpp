@@ -14,6 +14,10 @@ Eigen::Array3d Potential::GetAndResetVirial() {
     return retVal;
 }
 
-void Potential::Init(std::shared_ptr<Simulation> simulation) {
-    this->simulation = simulation;
+size_t Potential::GetAndResetPerfomedInteractions() {
+    const auto retVal = perfomedInteractions;
+    perfomedInteractions = 0;
+    return retVal;
 }
+
+void Potential::Init(std::shared_ptr<Simulation> simulation) { this->simulation = simulation; }

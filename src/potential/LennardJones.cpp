@@ -29,4 +29,6 @@ void LennardJones::CalculateForces(Utility::Particle &i, Utility::Particle &j) {
     // calculate potential energy and virial
     potentialEnergy += 4.0 * _epsilon * lj12m6;
     virial += dr * f;
+
+    perfomedInteractions++;
 }
