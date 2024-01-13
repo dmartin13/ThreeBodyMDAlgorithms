@@ -61,5 +61,9 @@ public:
     uint64_t GetNumBufferInteractions(int step);
     uint64_t GetNumParticleInteractions(int step);
 
+    std::vector<double>& GetKineticEnergy();
+    std::vector<double>& GetPotentialEnergy();
+    std::vector<double>& GetTotalEnergy();
+
     Eigen::Vector3d GetGForce();
 };

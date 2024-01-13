@@ -99,6 +99,25 @@ void gatherAndPrintMessages() {
     }
 }
 
+double calculateRelativeVariationInTrueEnergy(std::shared_ptr<Simulation> simulation) {
+    const auto eKin = simulation->GetKineticEnergy();
+    const auto eTotal = simulation->GetTotalEnergy();
+    const auto numSteps = eTotal.size();
+
+    assert((eKin.size() == eTotal.size()) &&
+           "Can not calculate Relative Variation In True Energy, since eKin and eTotal are not of the same size");
+
+    const auto avgKineticEnergy = std::reduce(eKin.begin(), eKin.end()) / static_cast<double>(numSteps);
+    const auto avgTotalEnergy = std::reduce(eTotal.begin(), eTotal.end()) / static_cast<double>(numSteps);
+
+    double sum = 0.0;
+    for (const auto eT : eTotal) {
+        sum += std::abs(eT - avgTotalEnergy);
+    }
+
+    return sum / avgKineticEnergy;
+}
+
 void forceCalcTest() {
     const double sigma = 1;
     const double epsilon = 1;
@@ -181,9 +200,11 @@ int main(int argc, char* argv[]) {
     // print messages
     gatherAndPrintMessages();
 
-    // if (worldRank == 0) {
-    //     forceCalcTest();
-    // }
+    // calculate relative variation in true energy
+    if (worldRank == 0) {
+        const auto rvite = calculateRelativeVariationInTrueEnergy(simulation);
+        std::cout << "Relative Variation In True Energy: " << rvite << std::endl;
+    }
 
     // finalize
     MPI_Type_free(&mpiParticleType);

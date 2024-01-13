@@ -224,6 +224,10 @@ uint64_t Simulation::GetNumParticleInteractions(int step) {
 
 Eigen::Vector3d Simulation::GetGForce() { return this->gForce; }
 
+std::vector<double>& Simulation::GetKineticEnergy() { return kineticEnergy; }
+std::vector<double>& Simulation::GetPotentialEnergy() { return potentialEnergy; }
+std::vector<double>& Simulation::GetTotalEnergy() { return totalEnergy; }
+
 void Simulation::writeSimulationStepToCSV(std::string file) {
     std::vector<Utility::Particle> receivedParticlesForCSVOutput;
 
