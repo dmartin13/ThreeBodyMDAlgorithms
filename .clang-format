@@ -3,7 +3,6 @@ BasedOnStyle: Google
 UseTab: Never
 IndentWidth: 4
 TabWidth: 4
-ColumnLimit: 0
 AccessModifierOffset: -4
 NamespaceIndentation: All
 AllowShortIfStatementsOnASingleLine: false
