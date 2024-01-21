@@ -180,11 +180,20 @@ void Simulation::Start() {
 #endif
 
         // print out some statistics of the simulation
-        if (this->GetTopology()->GetWorldRank() == 0) {
-            if ((not respaActive) or (respaActive and nextIsRespaIteration)) {
+        if ((not respaActive) or (respaActive and nextIsRespaIteration)) {
+            double potentialEnergyAfterIteration = potentialEnergy.back();
+            double kineticEnergyAfterIteration = kineticEnergy.back();
+            if (this->GetTopology()->GetWorldRank() == 0) {
+                MPI_Reduce(MPI_IN_PLACE, &potentialEnergyAfterIteration, 1, MPI_DOUBLE, MPI_SUM, 0,
+                           topology->GetComm());
+                MPI_Reduce(MPI_IN_PLACE, &kineticEnergyAfterIteration, 1, MPI_DOUBLE, MPI_SUM, 0, topology->GetComm());
                 std::cout << "Finalized iteration " << i << "\n"
-                          << "Potential Energy           : " << std::format("{}", potentialEnergy.back()) << "\n"
-                          << "Kinetic Energy             : " << std::format("{}", kineticEnergy.back()) << std::endl;
+                          << "Potential Energy           : " << std::format("{}", potentialEnergyAfterIteration) << "\n"
+                          << "Kinetic Energy             : " << std::format("{}", kineticEnergyAfterIteration)
+                          << std::endl;
+            } else {
+                MPI_Reduce(&potentialEnergyAfterIteration, nullptr, 1, MPI_DOUBLE, MPI_SUM, 0, topology->GetComm());
+                MPI_Reduce(&kineticEnergyAfterIteration, nullptr, 1, MPI_DOUBLE, MPI_SUM, 0, topology->GetComm());
             }
         }
     }

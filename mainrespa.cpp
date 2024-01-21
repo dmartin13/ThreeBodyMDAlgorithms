@@ -99,23 +99,31 @@ void gatherAndPrintMessages() {
     }
 }
 
-double calculateRelativeVariationInTrueEnergy(std::shared_ptr<Simulation> simulation) {
-    const auto eKin = simulation->GetKineticEnergy();
-    const auto eTotal = simulation->GetTotalEnergy();
+std::optional<double> calculateRelativeVariationInTrueEnergy(std::shared_ptr<Simulation> simulation) {
+    auto eKin = simulation->GetKineticEnergy();
+    auto eTotal = simulation->GetTotalEnergy();
     const auto numSteps = eTotal.size();
 
     assert((eKin.size() == eTotal.size()) &&
            "Can not calculate Relative Variation In True Energy, since eKin and eTotal are not of the same size");
 
-    const auto avgKineticEnergy = std::reduce(eKin.begin(), eKin.end()) / static_cast<double>(numSteps);
-    const auto avgTotalEnergy = std::reduce(eTotal.begin(), eTotal.end()) / static_cast<double>(numSteps);
+    if (simulation->GetTopology()->GetWorldRank() == 0) {
+        MPI_Reduce(MPI_IN_PLACE, eKin.data(), numSteps, MPI_DOUBLE, MPI_SUM, 0, simulation->GetTopology()->GetComm());
+        MPI_Reduce(MPI_IN_PLACE, eTotal.data(), numSteps, MPI_DOUBLE, MPI_SUM, 0, simulation->GetTopology()->GetComm());
 
-    double sum = 0.0;
-    for (const auto eT : eTotal) {
-        sum += std::abs(eT - avgTotalEnergy);
+        const auto avgKineticEnergy = std::reduce(eKin.begin(), eKin.end()) / static_cast<double>(numSteps);
+        const auto avgTotalEnergy = std::reduce(eTotal.begin(), eTotal.end()) / static_cast<double>(numSteps);
+
+        double sum = 0.0;
+        for (const auto eT : eTotal) {
+            sum += std::abs(eT - avgTotalEnergy);
+        }
+        return sum / avgKineticEnergy;
+    } else {
+        MPI_Reduce(eKin.data(), nullptr, numSteps, MPI_DOUBLE, MPI_SUM, 0, simulation->GetTopology()->GetComm());
+        MPI_Reduce(eTotal.data(), nullptr, numSteps, MPI_DOUBLE, MPI_SUM, 0, simulation->GetTopology()->GetComm());
     }
-
-    return sum / avgKineticEnergy;
+    return std::nullopt;
 }
 
 void forceCalcTest() {
@@ -201,9 +209,11 @@ int main(int argc, char* argv[]) {
     gatherAndPrintMessages();
 
     // calculate relative variation in true energy
-    if (worldRank == 0) {
-        const auto rvite = calculateRelativeVariationInTrueEnergy(simulation);
-        std::cout << "Relative Variation In True Energy: " << rvite << std::endl;
+    const auto rvite = calculateRelativeVariationInTrueEnergy(simulation);
+    if (simulation->GetTopology()->GetWorldRank() == 0) {
+        if (rvite.has_value()) {
+            std::cout << "Relative Variation In True Energy: " << rvite.value() << std::endl;
+        }
     }
 
     // finalize
