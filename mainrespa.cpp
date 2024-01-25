@@ -101,6 +101,8 @@ void gatherAndPrintMessages() {
 
 std::optional<double> calculateRelativeVariationInTrueEnergy(std::shared_ptr<Simulation> simulation) {
     auto eKin = simulation->GetKineticEnergy();
+    auto ePotTwoBody = simulation->GetPotentialEnergyTwoBody();
+    auto ePotThreeBody = simulation->GetPotentialEnergyThreeBody();
     auto eTotal = simulation->GetTotalEnergy();
     const auto numSteps = eTotal.size();
 
@@ -109,7 +111,48 @@ std::optional<double> calculateRelativeVariationInTrueEnergy(std::shared_ptr<Sim
 
     if (simulation->GetTopology()->GetWorldRank() == 0) {
         MPI_Reduce(MPI_IN_PLACE, eKin.data(), numSteps, MPI_DOUBLE, MPI_SUM, 0, simulation->GetTopology()->GetComm());
+        MPI_Reduce(MPI_IN_PLACE, ePotTwoBody.data(), numSteps, MPI_DOUBLE, MPI_SUM, 0,
+                   simulation->GetTopology()->GetComm());
+        MPI_Reduce(MPI_IN_PLACE, ePotThreeBody.data(), numSteps, MPI_DOUBLE, MPI_SUM, 0,
+                   simulation->GetTopology()->GetComm());
         MPI_Reduce(MPI_IN_PLACE, eTotal.data(), numSteps, MPI_DOUBLE, MPI_SUM, 0, simulation->GetTopology()->GetComm());
+
+        // print out the vectors
+        std::cout << "potential energy two-body: [";
+        for (size_t i = 0; i < numSteps; ++i) {
+            std::cout << std::format("{}", ePotTwoBody[i]);
+            if (i != numSteps - 1) {
+                std::cout << ", ";
+            }
+        }
+        std::cout << "]" << std::endl;
+
+        std::cout << "potential energy three-body: [";
+        for (size_t i = 0; i < numSteps; ++i) {
+            std::cout << std::format("{}", ePotThreeBody[i]);
+            if (i != numSteps - 1) {
+                std::cout << ", ";
+            }
+        }
+        std::cout << "]" << std::endl;
+
+        std::cout << "kinetic energy: [";
+        for (size_t i = 0; i < numSteps; ++i) {
+            std::cout << std::format("{}", eKin[i]);
+            if (i != numSteps - 1) {
+                std::cout << ", ";
+            }
+        }
+        std::cout << "]" << std::endl;
+
+        std::cout << "total energy: [";
+        for (size_t i = 0; i < numSteps; ++i) {
+            std::cout << std::format("{}", eTotal[i]);
+            if (i != numSteps - 1) {
+                std::cout << ", ";
+            }
+        }
+        std::cout << "]" << std::endl;
 
         const auto avgKineticEnergy = std::reduce(eKin.begin(), eKin.end()) / static_cast<double>(numSteps);
         const auto avgTotalEnergy = std::reduce(eTotal.begin(), eTotal.end()) / static_cast<double>(numSteps);
@@ -121,6 +164,9 @@ std::optional<double> calculateRelativeVariationInTrueEnergy(std::shared_ptr<Sim
         return sum / avgKineticEnergy;
     } else {
         MPI_Reduce(eKin.data(), nullptr, numSteps, MPI_DOUBLE, MPI_SUM, 0, simulation->GetTopology()->GetComm());
+        MPI_Reduce(ePotTwoBody.data(), nullptr, numSteps, MPI_DOUBLE, MPI_SUM, 0, simulation->GetTopology()->GetComm());
+        MPI_Reduce(ePotThreeBody.data(), nullptr, numSteps, MPI_DOUBLE, MPI_SUM, 0,
+                   simulation->GetTopology()->GetComm());
         MPI_Reduce(eTotal.data(), nullptr, numSteps, MPI_DOUBLE, MPI_SUM, 0, simulation->GetTopology()->GetComm());
     }
     return std::nullopt;

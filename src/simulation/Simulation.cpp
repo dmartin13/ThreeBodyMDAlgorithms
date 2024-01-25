@@ -109,15 +109,16 @@ void Simulation::Start() {
 
                 // calculate kinetic energy
                 const auto eKin = calculateKineticEnergy();
-                kineticEnergy.push_back(calculateKineticEnergy());
+                kineticEnergy.push_back(eKin);
 
                 // get the potential energy
-                const auto uPot =
-                    pairwisepotential->GetAndResetPotentialEnergy() + triwisepotential->GetAndResetPotentialEnergy();
-                potentialEnergy.push_back(uPot);
+                const auto uPotTwoBody = pairwisepotential->GetAndResetPotentialEnergy();
+                const auto uPotThreeBody = triwisepotential->GetAndResetPotentialEnergy();
+                potentialEnergyTwoBody.push_back(uPotTwoBody);
+                potentialEnergyThreeBody.push_back(uPotThreeBody);
 
                 // total energy
-                totalEnergy.push_back(eKin + uPot);
+                totalEnergy.push_back(uPotTwoBody + uPotThreeBody + eKin);
 
             } else if (not nextIsRespaIteration) {
                 pairwisepotential->GetAndResetPotentialEnergy();
@@ -142,15 +143,16 @@ void Simulation::Start() {
 
             // calculate kinetic energy
             const auto eKin = calculateKineticEnergy();
-            kineticEnergy.push_back(calculateKineticEnergy());
+            kineticEnergy.push_back(eKin);
 
             // get the potential energy
-            const auto uPot =
-                pairwisepotential->GetAndResetPotentialEnergy() + triwisepotential->GetAndResetPotentialEnergy();
-            potentialEnergy.push_back(uPot);
+            const auto uPotTwoBody = pairwisepotential->GetAndResetPotentialEnergy();
+            const auto uPotThreeBody = triwisepotential->GetAndResetPotentialEnergy();
+            potentialEnergyTwoBody.push_back(uPotTwoBody);
+            potentialEnergyThreeBody.push_back(uPotThreeBody);
 
             // total energy
-            totalEnergy.push_back(eKin + uPot);
+            totalEnergy.push_back(uPotTwoBody + uPotThreeBody + eKin);
         }
 
         // reset virial
@@ -183,18 +185,27 @@ void Simulation::Start() {
 
         // print out some statistics of the simulation
         if ((not respaActive) or (respaActive and nextIsRespaIteration)) {
-            double potentialEnergyAfterIteration = potentialEnergy.back();
+            double potentialEnergyAfterIterationTwoBody = potentialEnergyTwoBody.back();
+            double potentialEnergyAfterIterationThreeBody = potentialEnergyThreeBody.back();
             double kineticEnergyAfterIteration = kineticEnergy.back();
             if (this->GetTopology()->GetWorldRank() == 0) {
-                MPI_Reduce(MPI_IN_PLACE, &potentialEnergyAfterIteration, 1, MPI_DOUBLE, MPI_SUM, 0,
+                MPI_Reduce(MPI_IN_PLACE, &potentialEnergyAfterIterationTwoBody, 1, MPI_DOUBLE, MPI_SUM, 0,
+                           topology->GetComm());
+                MPI_Reduce(MPI_IN_PLACE, &potentialEnergyAfterIterationThreeBody, 1, MPI_DOUBLE, MPI_SUM, 0,
                            topology->GetComm());
                 MPI_Reduce(MPI_IN_PLACE, &kineticEnergyAfterIteration, 1, MPI_DOUBLE, MPI_SUM, 0, topology->GetComm());
-                std::cout << "Finalized iteration " << i << "\n"
-                          << "Potential Energy           : " << std::format("{}", potentialEnergyAfterIteration) << "\n"
-                          << "Kinetic Energy             : " << std::format("{}", kineticEnergyAfterIteration)
+                std::cout << "Finalized iteration         : " << i << "\n"
+                          << "Potential Energy Two-Body   : " << std::format("{}", potentialEnergyAfterIterationTwoBody)
+                          << "\n"
+                          << "Potential Energy Three-Body : "
+                          << std::format("{}", potentialEnergyAfterIterationThreeBody) << "\n"
+                          << "Kinetic Energy              : " << std::format("{}", kineticEnergyAfterIteration)
                           << std::endl;
             } else {
-                MPI_Reduce(&potentialEnergyAfterIteration, nullptr, 1, MPI_DOUBLE, MPI_SUM, 0, topology->GetComm());
+                MPI_Reduce(&potentialEnergyAfterIterationTwoBody, nullptr, 1, MPI_DOUBLE, MPI_SUM, 0,
+                           topology->GetComm());
+                MPI_Reduce(&potentialEnergyAfterIterationThreeBody, nullptr, 1, MPI_DOUBLE, MPI_SUM, 0,
+                           topology->GetComm());
                 MPI_Reduce(&kineticEnergyAfterIteration, nullptr, 1, MPI_DOUBLE, MPI_SUM, 0, topology->GetComm());
             }
         }
@@ -240,7 +251,8 @@ uint64_t Simulation::GetNumParticleInteractions(int step) {
 Eigen::Vector3d Simulation::GetGForce() { return this->gForce; }
 
 std::vector<double>& Simulation::GetKineticEnergy() { return kineticEnergy; }
-std::vector<double>& Simulation::GetPotentialEnergy() { return potentialEnergy; }
+std::vector<double>& Simulation::GetPotentialEnergyTwoBody() { return potentialEnergyTwoBody; }
+std::vector<double>& Simulation::GetPotentialEnergyThreeBody() { return potentialEnergyThreeBody; }
 std::vector<double>& Simulation::GetTotalEnergy() { return totalEnergy; }
 
 void Simulation::writeSimulationStepToCSV(std::string file) {

@@ -32,7 +32,8 @@ private:
     std::string csvOutput;
 
     std::vector<double> kineticEnergy;
-    std::vector<double> potentialEnergy;
+    std::vector<double> potentialEnergyTwoBody;
+    std::vector<double> potentialEnergyThreeBody;
     std::vector<double> totalEnergy;
 
     void writeSimulationStepToCSV(std::string file);
@@ -62,7 +63,8 @@ public:
     uint64_t GetNumParticleInteractions(int step);
 
     std::vector<double>& GetKineticEnergy();
-    std::vector<double>& GetPotentialEnergy();
+    std::vector<double>& GetPotentialEnergyTwoBody();
+    std::vector<double>& GetPotentialEnergyThreeBody();
     std::vector<double>& GetTotalEnergy();
 
     Eigen::Vector3d GetGForce();
