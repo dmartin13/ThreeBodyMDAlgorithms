@@ -62,13 +62,15 @@ void Simulation::Start() {
         const bool isRespaIteration = respaActive and (i % respaStepSize == 0);
         const bool nextIsRespaIteration = respaActive and ((i + 1) % respaStepSize == 0);
 
+        // if this is the first iteration we need a force calculation here so we can update the velocities with the
+        // threebody force if respa is used. If respa is not used, this forces are used in the first position update of
+        // the inner loop.
+        if (i == 0) {
+            this->algorithm->SimulationStep(ForceType::TwoAndThreeBody);
+            MPI_Barrier(this->topology->GetComm());
+        }
+
         if (respaActive and isRespaIteration) {
-            // if this is the first iteration we nedd a force calculation here so we can update the velocities with the
-            // threebody force.
-            if (i == 0) {
-                this->algorithm->SimulationStep(ForceType::ThreeBody);
-                MPI_Barrier(this->topology->GetComm());
-            }
             // update velocities with three body force
             decomposition->UpdateVelocities(dt, ForceType::ThreeBody, respaStepSize);
         }
