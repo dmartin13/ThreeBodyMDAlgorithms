@@ -59,7 +59,7 @@ void Simulation::Start() {
     for (int i = 0; i < iterations; ++i) {
         // write simulation step
 #if !defined(BENCHMARK_3BMDA) && !defined(TESTS_3BMDA) && !defined(PROFILE_3BMDA)
-        if (this->csvOutput.compare("") != 0) {
+        if (this->csvOutput.compare("") != 0 and (i % this->args.csvWriteInterval == 0)) {
             writeSimulationStepToCSV(this->csvOutput.substr(0, this->csvOutput.find_last_of('.')) + "_" +
                                      std::to_string(i) + ".csv");
         }

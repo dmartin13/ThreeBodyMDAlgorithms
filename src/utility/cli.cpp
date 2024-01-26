@@ -22,6 +22,7 @@ namespace Utility {
                   << "\t-e,--epsilon\t\tepsilon for LJ potential\n"
                   << "\t-nu,--nu\t\tparameter for ATM potential\n"
                   << "\t-csv,--csv\t\tcsv file with particles\n"
+                  << "\t-csvI,--csvInterval\t\tcsv write interval\n"
                   << "\t-o,--out\t\tcsv base file name that will be used to create all csv outputs from each "
                      "simulation step\n"
                   << "-op,--outProfile\t\tjson file to save profile output\n"
@@ -53,6 +54,14 @@ namespace Utility {
                         }
                         value = args[i + 1];
                         a.iterations = std::stoi(value);
+                        i++;
+                    } else if (flag.compare("csvI") == 0 || flag.compare("-csvInterval") == 0) {
+                        if (args.size() <= (size_t)(i + 1)) {
+                            a.printHelp();
+                            exit(1);
+                        }
+                        value = args[i + 1];
+                        a.csvWriteInterval = std::stoi(value);
                         i++;
                     } else if (flag.compare("r") == 0 || flag.compare("-respaStepSize") == 0) {
                         if (args.size() <= (size_t)(i + 1)) {

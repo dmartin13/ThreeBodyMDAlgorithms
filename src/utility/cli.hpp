@@ -11,6 +11,7 @@ namespace Utility {
     struct cliArguments {
         int iterations;
         int respaStepSize;
+        size_t csvWriteInterval{1};
         double cutoff;
         double deltaT;
         std::string inputCSV;
