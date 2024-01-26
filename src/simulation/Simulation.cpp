@@ -80,6 +80,12 @@ void Simulation::Start() {
         if (i == 0) {
             this->algorithm->SimulationStep(ForceType::TwoAndThreeBody);
             MPI_Barrier(this->topology->GetComm());
+            // we dont use the upot calculated in the initial force computation. We calculate the potential energy after
+            // the first position update
+            pairwisepotential->GetAndResetPotentialEnergy();
+            triwisepotential->GetAndResetPotentialEnergy();
+            pairwisepotential->GetAndResetVirial();
+            triwisepotential->GetAndResetVirial();
         }
 
         if (respaActive and isRespaIteration) {
