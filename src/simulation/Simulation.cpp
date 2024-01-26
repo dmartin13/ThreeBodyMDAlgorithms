@@ -20,6 +20,18 @@ void Simulation::Init() {
         }
     }
 
+    if (args.respaStepSize > 0) {
+        if (args.iterations % args.respaStepSize != 0) {
+            throw std::runtime_error("The number of iterations must be divisible by the respa step-size");
+        }
+
+        if (args.useThermostat) {
+            if (args.thermostatInterval % args.respaStepSize != 0) {
+                throw std::runtime_error("The thermostat interval must be divisible by the respa step-size");
+            }
+        }
+    }
+
     std::shared_ptr<Simulation> simulationPtr = shared_from_this();
     this->topology->Init(simulationPtr);
     this->decomposition->Init(simulationPtr);
@@ -101,9 +113,10 @@ void Simulation::Start() {
             if (not respaActive) {
                 // apply thermostat
                 if (args.useThermostat) {
-                    if (i % (args.thermostatInterval) == 0) {
+                    if ((i + 1) % (args.thermostatInterval) == 0) {
                         Thermostat::apply(decomposition->GetMyParticles(), args.targetTemperature,
                                           args.deltaTemperature);
+                        // std::cout << "apply thermostat in iteration " << i << std::endl;
                     }
                 }
 
@@ -136,8 +149,9 @@ void Simulation::Start() {
 
             // apply thermostat
             if (args.useThermostat) {
-                if (i % (args.thermostatInterval * respaStepSize) == 0) {
+                if ((i + 1) % (args.thermostatInterval) == 0) {
                     Thermostat::apply(decomposition->GetMyParticles(), args.targetTemperature, args.deltaTemperature);
+                    // std::cout << "apply thermostat in iteration " << i << std::endl;
                 }
             }
 
