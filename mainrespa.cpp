@@ -161,7 +161,7 @@ std::optional<double> calculateRelativeVariationInTrueEnergy(std::shared_ptr<Sim
         for (const auto eT : eTotal) {
             sum += std::abs(eT - avgTotalEnergy);
         }
-        return sum / avgKineticEnergy;
+        return sum / (numSteps * avgKineticEnergy);
     } else {
         MPI_Reduce(eKin.data(), nullptr, numSteps, MPI_DOUBLE, MPI_SUM, 0, simulation->GetTopology()->GetComm());
         MPI_Reduce(ePotTwoBody.data(), nullptr, numSteps, MPI_DOUBLE, MPI_SUM, 0, simulation->GetTopology()->GetComm());
