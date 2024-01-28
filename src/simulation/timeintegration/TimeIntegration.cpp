@@ -63,6 +63,9 @@ namespace TimeIntegration {
     void calculateVelocities(std::vector<Utility::Particle>& particles, const double deltaT, const bool outerRespaStep,
                              const int respaStepSize) {
         for (auto& p : particles) {
+            if (p.isDummy) {
+                continue;
+            }
             if (respaStepSize == -1) {
                 // respa is not active -> use both two and threebody force to update the velocities
                 const auto fX = p.f0X + p.f1X;

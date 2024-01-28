@@ -23,6 +23,12 @@ namespace Utility {
                   << "\t-nu,--nu\t\tparameter for ATM potential\n"
                   << "\t-csv,--csv\t\tcsv file with particles\n"
                   << "\t-csvI,--csvInterval\t\tcsv write interval\n"
+                  << "\t-blx,--blx\t\tbox length X\n"
+                  << "\t-bly,--bly\t\tbox length Y\n"
+                  << "\t-blZ,--blZ\t\tbox length Z\n"
+                  << "\t-blcx,--blcx\t\tbottom left corner X\n"
+                  << "\t-blcy,--blcy\t\tbottom left corner X\n"
+                  << "\t-blcZ,--blcZ\t\tbottom left corner X\n"
                   << "\t-o,--out\t\tcsv base file name that will be used to create all csv outputs from each "
                      "simulation step\n"
                   << "-op,--outProfile\t\tjson file to save profile output\n"
@@ -70,6 +76,54 @@ namespace Utility {
                         }
                         value = args[i + 1];
                         a.respaStepSize = std::stoi(value);
+                        i++;
+                    } else if (flag.compare("blx") == 0 || flag.compare("-blx") == 0) {
+                        if (args.size() <= (size_t)(i + 1)) {
+                            a.printHelp();
+                            exit(1);
+                        }
+                        value = args[i + 1];
+                        a.boxSize[0] = std::stod(value);
+                        i++;
+                    } else if (flag.compare("bly") == 0 || flag.compare("-bly") == 0) {
+                        if (args.size() <= (size_t)(i + 1)) {
+                            a.printHelp();
+                            exit(1);
+                        }
+                        value = args[i + 1];
+                        a.boxSize[1] = std::stod(value);
+                        i++;
+                    } else if (flag.compare("blz") == 0 || flag.compare("-blz") == 0) {
+                        if (args.size() <= (size_t)(i + 1)) {
+                            a.printHelp();
+                            exit(1);
+                        }
+                        value = args[i + 1];
+                        a.boxSize[2] = std::stod(value);
+                        i++;
+                    } else if (flag.compare("blcx") == 0 || flag.compare("-blcx") == 0) {
+                        if (args.size() <= (size_t)(i + 1)) {
+                            a.printHelp();
+                            exit(1);
+                        }
+                        value = args[i + 1];
+                        a.bottomLeft[0] = std::stod(value);
+                        i++;
+                    } else if (flag.compare("blcy") == 0 || flag.compare("-blcy") == 0) {
+                        if (args.size() <= (size_t)(i + 1)) {
+                            a.printHelp();
+                            exit(1);
+                        }
+                        value = args[i + 1];
+                        a.bottomLeft[1] = std::stod(value);
+                        i++;
+                    } else if (flag.compare("blcz") == 0 || flag.compare("-blcz") == 0) {
+                        if (args.size() <= (size_t)(i + 1)) {
+                            a.printHelp();
+                            exit(1);
+                        }
+                        value = args[i + 1];
+                        a.bottomLeft[2] = std::stod(value);
                         i++;
                     } else if (flag.compare("tI") == 0 || flag.compare("-thermostatInterval") == 0) {
                         if (args.size() <= (size_t)(i + 1)) {

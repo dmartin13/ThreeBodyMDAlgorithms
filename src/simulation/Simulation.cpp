@@ -12,6 +12,49 @@ Simulation::Simulation(Utility::cliArguments& args, int iterations, int respaSte
       mpiParticleType(mpiParticleType), particles(particles), dt(dt), gForce(gForce), csvOutput(csvOutput) {}
 
 void Simulation::Init() {
+    // calculate the position of the simulation box
+    if ((args.bottomLeft[0] == std::numeric_limits<double>::infinity()) or
+        (args.bottomLeft[1] == std::numeric_limits<double>::infinity()) or
+        (args.bottomLeft[2] == std::numeric_limits<double>::infinity())) {
+        double minX = std::numeric_limits<double>::max();
+        double minY = std::numeric_limits<double>::max();
+        double minZ = std::numeric_limits<double>::max();
+        double maxX = std::numeric_limits<double>::min();
+        double maxY = std::numeric_limits<double>::min();
+        double maxZ = std::numeric_limits<double>::min();
+
+        for (const auto& p : particles) {
+            if (p.isDummy) {
+                continue;
+            }
+            if (p.pX < minX) {
+                minX = p.pX;
+            }
+            if (p.pY < minY) {
+                minY = p.pY;
+            }
+            if (p.pZ < minZ) {
+                minZ = p.pZ;
+            }
+            if (p.pX > maxX) {
+                maxX = p.pX;
+            }
+            if (p.pY > maxY) {
+                maxY = p.pY;
+            }
+            if (p.pZ > maxZ) {
+                maxZ = p.pZ;
+            }
+        }
+        double meanX = minX + (std::abs(minX) + std::abs(maxX)) / 2.0;
+        double meanY = minY + (std::abs(minY) + std::abs(maxY)) / 2.0;
+        double meanZ = minZ + (std::abs(minZ) + std::abs(maxZ)) / 2.0;
+
+        args.bottomLeft[0] = meanX - args.boxSize[0] / 2.0;
+        args.bottomLeft[1] = meanY - args.boxSize[1] / 2.0;
+        args.bottomLeft[2] = meanZ - args.boxSize[2] / 2.0;
+    }
+
     // if add brownian motion is true we add it here to all particles. This is a really easy way so that all particles
     // always have the same random velocity regardless of num processors
     if (args.useThermostat and dt != 0) {
@@ -99,6 +142,10 @@ void Simulation::Start() {
             // update particle positions using the two-body force
             decomposition->UpdatePositions(dt, gForce, respaActive ? ForceType::TwoBody : ForceType::TwoAndThreeBody);
             MPI_Barrier(this->topology->GetComm());
+
+            // reflect particles at boundaries
+            reflectParticlesAtBoundariesHardWall();
+            // reflectParticlesAtBoundariesSoftLJPotential();
 
             // execute algorithm... force calculation
             // determine the forceType to calculate in this iteration
@@ -238,6 +285,74 @@ void Simulation::Start() {
                                  std::to_string(iterations) + ".csv");
     }
 #endif
+}
+
+void Simulation::reflectParticlesAtBoundariesHardWall() {
+    const std::array<double, 3> boxMin = args.bottomLeft;
+    const std::array<double, 3> boxMax = {args.bottomLeft[0] + args.boxSize[0], args.bottomLeft[1] + args.boxSize[1],
+                                          args.bottomLeft[2] + args.boxSize[2]};
+
+    for (auto& p : decomposition->GetMyParticles()) {
+        if (p.isDummy) {
+            continue;
+        }
+        if (p.pX < boxMin[0] or p.pX > boxMax[0]) {
+            p.vX *= -1.0;
+        }
+        if (p.pY < boxMin[1] or p.pY > boxMax[1]) {
+            p.vY *= -1.0;
+        }
+        if (p.pZ < boxMin[2] or p.pZ > boxMax[2]) {
+            p.vZ *= -1.0;
+        }
+    }
+}
+
+void Simulation::reflectParticlesAtBoundariesSoftLJPotential() {
+    const std::array<double, 3> boxMin = args.bottomLeft;
+    const std::array<double, 3> boxMax = {args.bottomLeft[0] + args.boxSize[0], args.bottomLeft[1] + args.boxSize[1],
+                                          args.bottomLeft[2] + args.boxSize[2]};
+
+    const auto sigmaSquared = args.sigma * args.sigma;
+    const auto epsilon24 = 24.0 * args.epsilon;
+
+    for (int dimensionIndex = 0; dimensionIndex < 3; ++dimensionIndex) {
+        for (auto& p : decomposition->GetMyParticles()) {
+            if (p.isDummy) {
+                continue;
+            }
+
+            auto reflect = [&p, dimensionIndex, sigmaSquared, epsilon24](double boundaryPos) {
+                // reflect position
+                const auto displacementToBoundary = boundaryPos - p.GetR()[dimensionIndex];
+                auto mirrorPosition = p.GetR();
+                mirrorPosition[dimensionIndex] += 2 * displacementToBoundary;
+
+                // calculate LJ Kernel
+                const Eigen::Array3d displacement = p.GetR() - mirrorPosition;
+                const auto distanceSquared = displacement.cwiseProduct(displacement).sum();
+                const auto inverseDistanceSquared = 1. / distanceSquared;
+                const auto lj2 = sigmaSquared * inverseDistanceSquared;
+                const auto lj6 = lj2 * lj2 * lj2;
+                const auto lj12 = lj6 * lj6;
+                const auto lj12m6 = lj12 - lj6;
+                const auto scalarMultiple = epsilon24 * (lj12 + lj12m6) * inverseDistanceSquared;
+                const Eigen::Array3d force = displacement * scalarMultiple;
+
+                // add force
+                p.f0X += force[0];
+                p.f0Y += force[1];
+                p.f0Z += force[2];
+            };
+
+            if (std::abs(p.GetR()[dimensionIndex] - boxMin[dimensionIndex]) < sixthRootOfTwo * 0.5 * args.sigma) {
+                reflect(boxMin[dimensionIndex]);
+            } else if (std::abs(p.GetR()[dimensionIndex] - boxMax[dimensionIndex]) <
+                       sixthRootOfTwo * 0.5 * args.sigma) {
+                reflect(boxMax[dimensionIndex]);
+            }
+        }
+    }
 }
 
 double Simulation::calculateKineticEnergy() {

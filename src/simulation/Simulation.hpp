@@ -35,6 +35,7 @@ private:
     std::vector<double> potentialEnergyTwoBody;
     std::vector<double> potentialEnergyThreeBody;
     std::vector<double> totalEnergy;
+    static constexpr double sixthRootOfTwo = std::pow(2., 1. / 6.);
 
     void writeSimulationStepToCSV(std::string file);
     double calculateKineticEnergy();
@@ -66,6 +67,8 @@ public:
     std::vector<double>& GetPotentialEnergyTwoBody();
     std::vector<double>& GetPotentialEnergyThreeBody();
     std::vector<double>& GetTotalEnergy();
+    void reflectParticlesAtBoundariesHardWall();
+    void reflectParticlesAtBoundariesSoftLJPotential();
 
     Eigen::Vector3d GetGForce();
 };

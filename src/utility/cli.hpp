@@ -21,6 +21,10 @@ namespace Utility {
         bool optimalDecomposition;
         std::string outputProfile;
         std::string benchYaml;
+        std::array<double, 3> boxSize;
+        std::array<double, 3> bottomLeft{std::numeric_limits<double>::infinity(),
+                                         std::numeric_limits<double>::infinity(),
+                                         std::numeric_limits<double>::infinity()};
 
         // thermostat parameters
         bool useThermostat{false};
