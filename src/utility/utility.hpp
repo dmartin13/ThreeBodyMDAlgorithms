@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iomanip>
 #include <memory>
 
 #include "../external/rapidcsv/src/rapidcsv.h"
@@ -23,5 +24,7 @@ namespace Utility {
     int BinomialCoefficient(const int n, const int k);
 
     std::string get_file_contents(const char *filename);
+
+    std::string makeOutputCSVFilename(std::string_view prefix, size_t numDigits, size_t num);
 
 }  // namespace Utility

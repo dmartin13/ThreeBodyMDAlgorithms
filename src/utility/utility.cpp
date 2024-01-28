@@ -82,4 +82,10 @@ namespace Utility {
         return contents.str();
     }
 
+    std::string makeOutputCSVFilename(std::string_view prefix, size_t numDigits, size_t num) {
+        std::stringstream ss;
+        ss << prefix << "_" << std::setw(numDigits) << std::setfill('0') << num << ".csv";
+        return ss.str();
+    }
+
 }  // namespace Utility

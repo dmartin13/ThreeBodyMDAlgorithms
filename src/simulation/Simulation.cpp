@@ -103,8 +103,9 @@ void Simulation::Start() {
         // write simulation step
 #if !defined(BENCHMARK_3BMDA) && !defined(TESTS_3BMDA) && !defined(PROFILE_3BMDA)
         if (this->csvOutput.compare("") != 0 and (i % this->args.csvWriteInterval == 0)) {
-            writeSimulationStepToCSV(this->csvOutput.substr(0, this->csvOutput.find_last_of('.')) + "_" +
-                                     std::to_string(i) + ".csv");
+            writeSimulationStepToCSV(
+                Utility::makeOutputCSVFilename(this->csvOutput.substr(0, this->csvOutput.find_last_of('.')),
+                                               std::to_string(std::abs(iterations)).length(), i));
         }
 #endif
 
@@ -281,8 +282,9 @@ void Simulation::Start() {
     // Record last state of simulation.
 #if !defined(BENCHMARK_3BMDA) && !defined(TESTS_3BMDA) && !defined(PROFILE_3BMDA)
     if (this->csvOutput.compare("") != 0) {
-        writeSimulationStepToCSV(this->csvOutput.substr(0, this->csvOutput.find_last_of('.')) + "_" +
-                                 std::to_string(iterations) + ".csv");
+        writeSimulationStepToCSV(
+            Utility::makeOutputCSVFilename(this->csvOutput.substr(0, this->csvOutput.find_last_of('.')),
+                                           std::to_string(std::abs(iterations)).length(), iterations));
     }
 #endif
 }
