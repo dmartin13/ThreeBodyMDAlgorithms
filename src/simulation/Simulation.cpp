@@ -110,9 +110,9 @@ void Simulation::Start() {
 #endif
 
 #ifdef MEASURESIMSTEP_3BMDA
-        std::chrono::time_point<std::chrono::system_clock> start;
-        std::chrono::time_point<std::chrono::system_clock> end;
-        start = std::chrono::system_clock::now();
+        std::chrono::time_point<std::chrono::high_resolution_clock> start;
+        std::chrono::time_point<std::chrono::high_resolution_clock> end;
+        start = std::chrono::high_resolution_clock::now();
 #endif
         // determine if this iteration is a respa step
         const bool isRespaIteration = respaActive and (i % respaStepSize == 0);
@@ -233,7 +233,7 @@ void Simulation::Start() {
         triwisepotential->GetAndResetVirial();
 
 #ifdef MEASURESIMSTEP_3BMDA
-        end = std::chrono::system_clock::now();
+        end = std::chrono::high_resolution_clock::now();
         auto elapsed_time = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start);
         std::vector<uint64_t> allTimes;
         if (topology->GetWorldRank() == 0) {
