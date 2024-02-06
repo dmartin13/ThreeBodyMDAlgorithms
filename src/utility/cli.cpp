@@ -15,6 +15,7 @@ namespace Utility {
                   << "\t-tTargetT,--thermostatTargetTemperature\tThermostat Target Temperature\n"
                   << "\t-tAddB,--thermostatAddBrownianMotion\tThermostat Add Brownian Motion\n"
                   << "\t-d,--delta\t\tduration of one simulation step\n"
+                  << "\t-reflect,--reflect\t\tuse reflection of particles (0 = off, 1 = hardwall, 2 = softwall)\n"
                   << "\t-gx,--gravityZ\t\tgravitational force in x-direction\n"
                   << "\t-gy,--gravityY\t\tgravitational force in y-direction\n"
                   << "\t-gz,--gravityZ\t\tgravitational force in z-direction\n"
@@ -199,6 +200,14 @@ namespace Utility {
                         }
                         value = args[i + 1];
                         a.deltaT = std::stod(value);
+                        i++;
+                    } else if (flag.compare("reflect") == 0 || flag.compare("-reflect") == 0) {
+                        if (args.size() <= (size_t)(i + 1)) {
+                            a.printHelp();
+                            exit(1);
+                        }
+                        value = args[i + 1];
+                        a.reflect = std::stoi(value);
                         i++;
                     } else if (flag.compare("csv") == 0 || flag.compare("-csv") == 0) {
                         if (args.size() <= (size_t)(i + 1)) {

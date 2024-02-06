@@ -145,8 +145,15 @@ void Simulation::Start() {
             MPI_Barrier(this->topology->GetComm());
 
             // reflect particles at boundaries
-            reflectParticlesAtBoundariesHardWall();
-            // reflectParticlesAtBoundariesSoftLJPotential();
+            if (args.reflect > 0) {
+                if (args.reflect == 1) {
+                    reflectParticlesAtBoundariesHardWall();
+                    std::cout << "reflect hard wall" << std::endl;
+                } else if (args.reflect == 2) {
+                    reflectParticlesAtBoundariesSoftLJPotential();
+                    std::cout << "reflect soft wall" << std::endl;
+                }
+            }
 
             // execute algorithm... force calculation
             // determine the forceType to calculate in this iteration
