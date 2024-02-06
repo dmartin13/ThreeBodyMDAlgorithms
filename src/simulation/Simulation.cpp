@@ -148,10 +148,8 @@ void Simulation::Start() {
             if (args.reflect > 0) {
                 if (args.reflect == 1) {
                     reflectParticlesAtBoundariesHardWall();
-                    std::cout << "reflect hard wall" << std::endl;
                 } else if (args.reflect == 2) {
                     reflectParticlesAtBoundariesSoftLJPotential();
-                    std::cout << "reflect soft wall" << std::endl;
                 }
             }
 
