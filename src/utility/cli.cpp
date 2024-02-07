@@ -14,6 +14,7 @@ namespace Utility {
                   << "\t-tDeltaT,--thermostatDeltaTemperature\tThermostat Delta Temperature\n"
                   << "\t-tTargetT,--thermostatTargetTemperature\tThermostat Target Temperature\n"
                   << "\t-tAddB,--thermostatAddBrownianMotion\tThermostat Add Brownian Motion\n"
+                  << "\t-no3b,--disable3body\tdisable three body interactions\n"
                   << "\t-d,--delta\t\tduration of one simulation step\n"
                   << "\t-reflect,--reflect\t\tuse reflection of particles (0 = off, 1 = hardwall, 2 = softwall)\n"
                   << "\t-gx,--gravityZ\t\tgravitational force in x-direction\n"
@@ -165,6 +166,8 @@ namespace Utility {
                     } else if (flag.compare("tAddB") == 0 || flag.compare("-thermostatAddBrownianMotion") == 0) {
                         a.addBrownianMotion = true;
                         a.useThermostat = true;
+                    } else if (flag.compare("no3b") == 0 || flag.compare("-disable3body") == 0) {
+                        a.disableThreebodyInteractions = true;
                     } else if (flag.compare("a") == 0 || flag.compare("-algorithm") == 0) {
                         if (args.size() <= (size_t)(i + 1)) {
                             a.printHelp();

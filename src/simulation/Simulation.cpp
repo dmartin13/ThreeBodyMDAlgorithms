@@ -97,7 +97,13 @@ void Simulation::Start() {
         Thermostat::apply(decomposition->GetMyParticles(), args.initialTemperature, std::numeric_limits<double>::max());
     }
 
-    const bool respaActive = respaStepSize > 0;
+    const bool involveThreebodyInteractions = not args.disableThreebodyInteractions;
+    const bool respaActive = (respaStepSize > 0) and involveThreebodyInteractions;
+
+    if (this->topology->GetWorldRank() == 0) {
+        std::cout << "involveThreebodyInteractions: " << (involveThreebodyInteractions ? "true" : "false") << std::endl;
+        std::cout << "respaActive: " << (respaActive ? "true" : "false") << std::endl;
+    }
 
     for (int i = 0; i < iterations; ++i) {
         // write simulation step
@@ -122,7 +128,8 @@ void Simulation::Start() {
         // threebody force if respa is used. If respa is not used, this forces are used in the first position update of
         // the inner loop.
         if (i == 0) {
-            this->algorithm->SimulationStep(ForceType::TwoAndThreeBody);
+            this->algorithm->SimulationStep(involveThreebodyInteractions ? ForceType::TwoAndThreeBody
+                                                                         : ForceType::TwoBody);
             MPI_Barrier(this->topology->GetComm());
             // we dont use the upot calculated in the initial force computation. We calculate the potential energy after
             // the first position update
@@ -141,7 +148,10 @@ void Simulation::Start() {
         // störmer verlet integration
         {
             // update particle positions using the two-body force
-            decomposition->UpdatePositions(dt, gForce, respaActive ? ForceType::TwoBody : ForceType::TwoAndThreeBody);
+            decomposition->UpdatePositions(
+                dt, gForce,
+                respaActive ? ForceType::TwoBody
+                            : (involveThreebodyInteractions ? ForceType::TwoAndThreeBody : ForceType::TwoBody));
             MPI_Barrier(this->topology->GetComm());
 
             // reflect particles at boundaries
@@ -156,7 +166,7 @@ void Simulation::Start() {
             // execute algorithm... force calculation
             // determine the forceType to calculate in this iteration
             auto forceTypeToCalculate = ForceType::TwoAndThreeBody;
-            if (respaActive and (not nextIsRespaIteration)) {
+            if ((respaActive and (not nextIsRespaIteration)) or (not involveThreebodyInteractions)) {
                 // if respa should be used but the next iteration is not a respa iteration then only calculate two body
                 // interactions
                 forceTypeToCalculate = ForceType::TwoBody;
@@ -166,8 +176,11 @@ void Simulation::Start() {
             MPI_Barrier(this->topology->GetComm());
 
             // update the velocities
-            decomposition->UpdateVelocities(dt, respaActive ? ForceType::TwoBody : ForceType::TwoAndThreeBody,
-                                            respaStepSize);
+            decomposition->UpdateVelocities(
+                dt,
+                respaActive ? ForceType::TwoBody
+                            : (involveThreebodyInteractions ? ForceType::TwoAndThreeBody : ForceType::TwoBody),
+                respaStepSize);
 
             if (not respaActive) {
                 // apply thermostat

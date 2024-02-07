@@ -22,6 +22,7 @@ namespace Utility {
         std::string outputProfile;
         std::string benchYaml;
         unsigned reflect;
+        bool disableThreebodyInteractions{false};
         std::array<double, 3> boxSize;
         std::array<double, 3> bottomLeft{std::numeric_limits<double>::infinity(),
                                          std::numeric_limits<double>::infinity(),
