@@ -4,6 +4,7 @@
 #include <chrono>
 #endif
 
+#define FMT_HEADER_ONLY
 #include <fmt/core.h>
 
 #include "Thermostat.hpp"
