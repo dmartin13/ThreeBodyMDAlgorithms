@@ -16,6 +16,6 @@
 [submodule "src/external/rapidjson"]
 	path = src/external/rapidjson
 	url = https://github.com/Tencent/rapidjson.git
-[submodule "external/fmt"]
-	path = external/fmt
+[submodule "src/external/fmt"]
+	path = src/external/fmt
 	url = https://github.com/fmtlib/fmt.git
