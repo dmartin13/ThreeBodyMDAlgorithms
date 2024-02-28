@@ -18,7 +18,7 @@ find_package(Eigen3 REQUIRED)
 find_package(MPI REQUIRED)
 find_package(OpenMP REQUIRED)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 if(NOT CMAKE_BUILD_TYPE)
@@ -63,6 +63,7 @@ file(GLOB_RECURSE MAINRESPA_SOURCES CONFIGURE_DEPENDS "src/*.hpp" "src/*.cpp")
 add_executable(mainrespa mainrespa.cpp ${MAINRESPA_SOURCES})
 
 target_include_directories(mainrespa PRIVATE src)
+target_include_directories(mainrespa PRIVATE external/fmt/include)
 target_include_directories(mainrespa PRIVATE ${MPI_INCLUDE_PATH})
 
 target_link_libraries(mainrespa ${MPI_C_LIBRARIES})

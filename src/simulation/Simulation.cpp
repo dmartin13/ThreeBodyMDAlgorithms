@@ -280,13 +280,11 @@ void Simulation::Start() {
                 MPI_Reduce(MPI_IN_PLACE, &potentialEnergyAfterIterationThreeBody, 1, MPI_DOUBLE, MPI_SUM, 0,
                            topology->GetComm());
                 MPI_Reduce(MPI_IN_PLACE, &kineticEnergyAfterIteration, 1, MPI_DOUBLE, MPI_SUM, 0, topology->GetComm());
-                std::cout << "Finalized iteration         : " << i << "\n"
-                          << "Potential Energy Two-Body   : " << std::format("{}", potentialEnergyAfterIterationTwoBody)
-                          << "\n"
-                          << "Potential Energy Three-Body : "
-                          << std::format("{}", potentialEnergyAfterIterationThreeBody) << "\n"
-                          << "Kinetic Energy              : " << std::format("{}", kineticEnergyAfterIteration)
-                          << std::endl;
+                fmt::print(
+                    "Finalized iteration         : {}\nPotential Energy Two-Body   : {}\nPotential Energy Three-Body : "
+                    "{}\nKinetic Energy              : {}\n",
+                    i, potentialEnergyAfterIterationTwoBody, potentialEnergyAfterIterationThreeBody,
+                    kineticEnergyAfterIteration);
             } else {
                 MPI_Reduce(&potentialEnergyAfterIterationTwoBody, nullptr, 1, MPI_DOUBLE, MPI_SUM, 0,
                            topology->GetComm());

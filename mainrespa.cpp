@@ -1,7 +1,8 @@
+#include <fmt/core.h>
 #include <mpi.h>
 
-#include <format>
 #include <iostream>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -120,7 +121,7 @@ std::optional<double> calculateRelativeVariationInTrueEnergy(std::shared_ptr<Sim
         // print out the vectors
         std::cout << "potential energy two-body: [";
         for (size_t i = 0; i < numSteps; ++i) {
-            std::cout << std::format("{}", ePotTwoBody[i]);
+            fmt::print("{}", ePotTwoBody[i]);
             if (i != numSteps - 1) {
                 std::cout << ", ";
             }
@@ -129,7 +130,7 @@ std::optional<double> calculateRelativeVariationInTrueEnergy(std::shared_ptr<Sim
 
         std::cout << "potential energy three-body: [";
         for (size_t i = 0; i < numSteps; ++i) {
-            std::cout << std::format("{}", ePotThreeBody[i]);
+            fmt::print("{}", ePotThreeBody[i]);
             if (i != numSteps - 1) {
                 std::cout << ", ";
             }
@@ -138,7 +139,7 @@ std::optional<double> calculateRelativeVariationInTrueEnergy(std::shared_ptr<Sim
 
         std::cout << "kinetic energy: [";
         for (size_t i = 0; i < numSteps; ++i) {
-            std::cout << std::format("{}", eKin[i]);
+            fmt::print("{}", eKin[i]);
             if (i != numSteps - 1) {
                 std::cout << ", ";
             }
@@ -147,7 +148,7 @@ std::optional<double> calculateRelativeVariationInTrueEnergy(std::shared_ptr<Sim
 
         std::cout << "total energy: [";
         for (size_t i = 0; i < numSteps; ++i) {
-            std::cout << std::format("{}", eTotal[i]);
+            fmt::print("{}", eTotal[i]);
             if (i != numSteps - 1) {
                 std::cout << ", ";
             }
@@ -211,12 +212,12 @@ void forceCalcTest() {
     triwiseForces[2] += std::get<2>(fp0p1p2);
 
     for (int i = 0; i < 3; ++i) {
-        std::cout << "total two-body force of p" << i << ": (" << pairwiseForces[i][0] << ", " << pairwiseForces[i][1]
-                  << ", " << pairwiseForces[i][2] << "), total three-body force of p" << i << ": ("
-                  << triwiseForces[i][0] << ", " << triwiseForces[i][1] << ", " << triwiseForces[i][2]
-                  << "), total sum: (" << std::format("{}", pairwiseForces[i][0] + triwiseForces[i][0]) << ", "
-                  << std::format("{}", pairwiseForces[i][1] + triwiseForces[i][1]) << ", "
-                  << std::format("{}", pairwiseForces[i][2] + triwiseForces[i][2]) << ")" << std::endl;
+        fmt::print(
+            "total two-body force of p {}: ({}, {}, {}), total three-body force of p {}: ({}, {}, {}), total sum: ({}, "
+            "{}, {})\n",
+            i, pairwiseForces[i][0], pairwiseForces[i][1], pairwiseForces[i][2], i, triwiseForces[i][0],
+            triwiseForces[i][1], triwiseForces[i][2], pairwiseForces[i][0] + triwiseForces[i][0],
+            pairwiseForces[i][1] + triwiseForces[i][1], pairwiseForces[i][2] + triwiseForces[i][2]);
     }
 }
 

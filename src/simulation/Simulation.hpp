@@ -4,7 +4,7 @@
 #include <chrono>
 #endif
 
-#include <format>
+#include <fmt/core.h>
 
 #include "Thermostat.hpp"
 #include "algorithm/Algorithm.hpp"
